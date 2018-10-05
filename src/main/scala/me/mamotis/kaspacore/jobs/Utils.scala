@@ -1,0 +1,32 @@
+package me.mamotis.kaspacore.jobs
+
+import com.datastax.spark.connector.cql.CassandraConnector
+import me.mamotis.kaspacore.util.PropertiesLoader
+import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.SparkSession
+
+private[jobs] trait Utils {
+  def getSparkContext(session: SparkSession): SparkContext = {
+    session.sparkContext
+  }
+
+  def getSparkSession(strings: Array[String]): SparkSession = {
+    val conf = new SparkConf(true)
+      .setMaster(PropertiesLoader.sparkMaster)
+      .setAppName(PropertiesLoader.sparkAppName)
+      .set("spark.app.id", PropertiesLoader.sparkAppId)
+//      .set("spark.cassandra.connection.host", PropertiesLoader.sparkCassandraConnectionHost)
+
+    val session = SparkSession.builder()
+      .config(conf)
+      .getOrCreate()
+
+    session
+  }
+
+  def getCassandraSession(context: SparkContext): CassandraConnector = {
+    val cassandraSession = CassandraConnector.apply(context.getConf)
+
+    cassandraSession
+  }
+}

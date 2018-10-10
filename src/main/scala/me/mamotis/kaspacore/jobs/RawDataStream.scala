@@ -116,13 +116,13 @@ object RawDataStream extends Utils {
       .foreach(writerEvent)
       .start()
 
-    val eventPushHDFS = eventDs
-      .writeStream
-      .format("json")
-      .option("path", PropertiesLoader.hadoopEventFilePath)
-      .start()
+//    val eventPushHDFS = eventDs
+//      .writeStream
+//      .format("json")
+//      .option("path", PropertiesLoader.hadoopEventFilePath)
+//      .start()
 
     eventPushQuery.awaitTermination()
-    eventPushHDFS.awaitTermination()
+//    eventPushHDFS.awaitTermination()
   }
 }

@@ -14,14 +14,14 @@ dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-annotations" % "2
 
 // https://mvnrepository.com/artifact/org.apache.spark/spark-sql
 //libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.3.1" % "provided"
-libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.3.1" % "provided" exclude("com.fasterxml.jackson.core", "jackson-databind")
-
-// https://mvnrepository.com/artifact/org.apache.spark/spark-sql-kafka-0-10
-libraryDependencies += "org.apache.spark" %% "spark-sql-kafka-0-10" % "2.3.1"
+libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.3.1"
 
 // https://mvnrepository.com/artifact/org.apache.spark/spark-core
 //libraryDependencies += "org.apache.spark" %% "spark-core" % "2.3.1" % "provided"
-libraryDependencies += "org.apache.spark" %% "spark-core" % "2.3.1" % "provided" exclude("com.fasterxml.jackson.core", "jackson-databind")
+libraryDependencies += "org.apache.spark" %% "spark-core" % "2.3.1"
+
+// https://mvnrepository.com/artifact/org.apache.spark/spark-sql-kafka-0-10
+libraryDependencies += "org.apache.spark" %% "spark-sql-kafka-0-10" % "2.3.1"
 
 libraryDependencies += "io.confluent" % "kafka-avro-serializer" % "5.0.0"
 
@@ -45,10 +45,10 @@ libraryDependencies += "org.typelevel" %% "cats-effect-laws" % "1.0.0" % "test"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.2"
 
-assemblyMergeStrategy in assembly := {
-  {
-    case "META-INF/services/org.apache.spark.sql.sources.DataSourceRegister" => MergeStrategy.concat
-    case PathList("META-INF", xs @ _*) => MergeStrategy.discard
-    case x => MergeStrategy.first
-  }
-}
+//assemblyMergeStrategy in assembly := {
+//  {
+//    case "META-INF/services/org.apache.spark.sql.sources.DataSourceRegister" => MergeStrategy.concat
+//    case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+//    case x => MergeStrategy.first
+//  }
+//}

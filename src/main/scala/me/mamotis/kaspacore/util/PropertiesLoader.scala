@@ -20,4 +20,5 @@ object PropertiesLoader {
   val GeoIpFilename = conf.getString("GEOIP_FILENAME")
 
   val hadoopEventFilePath = conf.getString("HADOOP_EVENT_FILE_PATH")
+  val checkpointLocation = conf.getString("CHECKPOINT_LOCATION")
 }

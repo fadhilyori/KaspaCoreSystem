@@ -120,6 +120,7 @@ object RawDataStream extends Utils {
       .writeStream
       .format("json")
       .option("path", PropertiesLoader.hadoopEventFilePath)
+      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
       .start()
 
     eventPushQuery.awaitTermination()

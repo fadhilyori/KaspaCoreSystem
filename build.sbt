@@ -45,10 +45,10 @@ libraryDependencies += "org.typelevel" %% "cats-effect-laws" % "1.0.0" % "test"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.2"
 
-//assemblyMergeStrategy in assembly := {
-//  {
-//    case "META-INF/services/org.apache.spark.sql.sources.DataSourceRegister" => MergeStrategy.concat
-//    case PathList("META-INF", xs @ _*) => MergeStrategy.discard
-//    case x => MergeStrategy.first
-//  }
-//}
+assemblyMergeStrategy in assembly := {
+  {
+    case "META-INF/services/org.apache.spark.sql.sources.DataSourceRegister" => MergeStrategy.concat
+    case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+    case x => MergeStrategy.last
+  }
+}

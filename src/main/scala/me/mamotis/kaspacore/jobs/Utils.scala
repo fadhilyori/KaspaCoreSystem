@@ -15,7 +15,9 @@ private[jobs] trait Utils {
       .setMaster(PropertiesLoader.sparkMaster)
       .setAppName(PropertiesLoader.sparkAppName)
       .set("spark.app.id", PropertiesLoader.sparkAppId)
-//      .set("spark.cassandra.connection.host", PropertiesLoader.sparkCassandraConnectionHost)
+      .set("spark.cassandra.connection.host", PropertiesLoader.sparkCassandraConnectionHost)
+      .set("spark.cassandra.auth.username", PropertiesLoader.cassandraUsername)
+      .set("spark.cassandra.auth.password", PropertiesLoader.cassandraPassword)
 
     val session = SparkSession.builder()
       .config(conf)

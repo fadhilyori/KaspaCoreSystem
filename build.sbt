@@ -4,10 +4,6 @@ version := "0.1"
 
 scalaVersion := "2.11.12"
 
-assemblyShadeRules in assembly := Seq(
-  ShadeRule.rename("com.fasterxml.**" -> "shadeio.@1").inAll
-)
-
 resolvers += "confluent" at "http://packages.confluent.io/maven/"
 resolvers += "Spark Packages Repo" at "https://dl.bintray.com/spark-packages/maven"
 

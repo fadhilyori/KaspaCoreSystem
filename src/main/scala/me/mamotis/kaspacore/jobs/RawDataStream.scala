@@ -69,10 +69,14 @@ object RawDataStream extends Utils {
       val sig_gen = r.getAs[Long](14).toInt
       val sig_rev = r.getAs[Long](15).toInt
       val company = r.getAs[String](16)
-      val src_country = Tools.IpLookupCountry(src_ip)
-      val src_region = Tools.IpLookupRegion(src_ip)
-      val dest_country = Tools.IpLookupCountry(dest_ip)
-      val dest_region = Tools.IpLookupRegion(dest_ip)
+//      val src_country = Tools.IpLookupCountry(src_ip)
+      val src_country = "Dummy Country"
+//      val src_region = Tools.IpLookupRegion(src_ip)
+      val src_region = "Dummy City"
+//      val dest_country = Tools.IpLookupCountry(dest_ip)
+      val dest_country = "Dummy Country"
+//      val dest_region = Tools.IpLookupRegion(dest_ip)
+      val dest_region = "Dummy City"
 
       val date = new DateTime((r.getAs[String](0).toDouble * 1000).toLong)
       val year = date.getYear()
@@ -109,21 +113,25 @@ object RawDataStream extends Utils {
     }
 
     //====================================================WRITE QUERY=================================
-    val eventPushQuery = eventDs
+    val eventConsoleQuery = eventDs
       .writeStream
-      .outputMode("append")
-      .queryName("Event Push Cassandra")
-      .foreach(writerEvent)
-      .start()
-
-    val eventPushHDFS = eventDs
-      .writeStream
-      .format("json")
-      .option("path", PropertiesLoader.hadoopEventFilePath)
-      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
-      .start()
-
-    eventPushQuery.awaitTermination()
-    eventPushHDFS.awaitTermination()
+      .outputMode("console")
+      .start().awaitTermination()
+//    val eventPushQuery = eventDs
+//      .writeStream
+//      .outputMode("append")
+//      .queryName("Event Push Cassandra")
+//      .foreach(writerEvent)
+//      .start()
+//
+//    val eventPushHDFS = eventDs
+//      .writeStream
+//      .format("json")
+//      .option("path", PropertiesLoader.hadoopEventFilePath)
+//      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
+//      .start()
+//
+//    eventPushQuery.awaitTermination()
+//    eventPushHDFS.awaitTermination()
   }
 }

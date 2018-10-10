@@ -6,11 +6,14 @@ scalaVersion := "2.11.12"
 
 assemblyShadeRules in assembly := Seq(
   ShadeRule.rename("com.fasterxml.**" -> "shadeio.@1")
-  .inLibrary("com.fasterxml.jackson.core" % "jackson-databind" % "2.9.7")
-  .inLibrary("com.fasterxml.jackson.core" % "jackson-core" % "2.9.7")
-  .inLibrary("com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.7")
-  .inLibrary("com.fasterxml.jackson.core" % "jackson-annotations" % "2.9.7")
-  .inProject
+    .inLibrary("com.fasterxml.jackson.core" % "jackson-databind" % "2.9.7")
+    .inLibrary("com.fasterxml.jackson.core" % "jackson-core" % "2.9.7")
+    .inLibrary("com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.7")
+    .inLibrary("com.fasterxml.jackson.core" % "jackson-annotations" % "2.9.7")
+    .inLibrary("com.snowplowanalytics" %% "scala-maxmind-iplookups" % "0.5.0")
+    .inLibrary("com.maxmind.geoip2" % "geoip2" % "2.11.0")
+    .inLibrary("com.maxmind.db" % "maxmind-db" % "1.2.2")
+    .inProject
 )
 
 resolvers += "confluent" at "http://packages.confluent.io/maven/"
@@ -49,6 +52,12 @@ libraryDependencies += "joda-time" % "joda-time" % "2.10"
 libraryDependencies += "com.datastax.spark" %% "spark-cassandra-connector" % "2.3.1"
 
 libraryDependencies += "com.snowplowanalytics" %% "scala-maxmind-iplookups" % "0.5.0"
+
+// https://mvnrepository.com/artifact/com.maxmind.geoip2/geoip2
+libraryDependencies += "com.maxmind.geoip2" % "geoip2" % "2.11.0"
+
+// https://mvnrepository.com/artifact/com.maxmind.db/maxmind-db
+libraryDependencies += "com.maxmind.db" % "maxmind-db" % "1.2.2"
 
 libraryDependencies += "org.typelevel" %% "cats-effect-laws" % "1.0.0" % "test"
 

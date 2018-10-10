@@ -50,7 +50,7 @@ object RawDataStream extends Utils {
     //+++++++++++Raw Data++++++++++++++
     val eventDf = parsedRawDf.select(
       $"timestamp", $"device_id", $"protocol", $"ip_type", $"src_mac", $"dest_mac", $"src_ip",
-      $"dest_ip", $"src_port", $"dest_port", $"alert_msg", $"classification", $"priority", $"sig_id",
+      $"dst_ip", $"src_port", $"dest_port", $"alert_msg", $"classification", $"priority", $"sig_id",
       $"sig_gen", $"sig_rev", $"company"
     ).map { r =>
       val device_id = r.getAs[String](1)

@@ -112,15 +112,12 @@ object RawDataStream extends Utils {
       override def close(errorOrNull: Throwable): Unit = {}
     }
 
-    val version = com.fasterxml.jackson.core.json.PackageVersion.VERSION
-    println("JACKSON VERSION : " + version)
-
     //====================================================WRITE QUERY=================================
-//    val eventConsoleQuery = eventDs
-//      .writeStream
-//      .outputMode("append")
-//      .format("console")
-//      .start().awaitTermination()
+    val eventConsoleQuery = eventDs
+      .writeStream
+      .outputMode("append")
+      .format("console")
+      .start().awaitTermination()
 
 //    val eventPushQuery = eventDs
 //      .writeStream

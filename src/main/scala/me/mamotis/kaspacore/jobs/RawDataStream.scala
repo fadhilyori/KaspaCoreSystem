@@ -50,7 +50,7 @@ object RawDataStream extends Utils {
     //+++++++++++Raw Data++++++++++++++
     val eventDf = parsedRawDf.select(
       $"timestamp", $"device_id", $"protocol", $"ip_type", $"src_mac", $"dest_mac", $"src_ip",
-      $"dest_ip", $"src_port", $"dst_port", $"alert_msg", $"classification", $"priority", $"sig_id",
+      $"dest_ip", $"src_port", $"dest_port", $"alert_msg", $"classification", $"priority", $"sig_id",
       $"sig_gen", $"sig_rev", $"company"
     ).map { r =>
       val device_id = r.getAs[String](1)
@@ -93,9 +93,9 @@ object RawDataStream extends Utils {
     val eventDs = eventDf.select($"company", $"device_id", $"year", $"month",
       $"day", $"hour", $"minute", $"second", $"protocol", $"ip_type",
       $"src_mac", $"dest_mac", $"src_ip", $"dest_ip", $"src_port",
-      $"dst_port", $"alert_msg", $"classification", $"priority",
+      $"dest_port", $"alert_msg", $"classification", $"priority",
       $"sig_id", $"sig_gen", $"sig_rev", $"src_country", $"src_region",
-      $"dst_country", $"dst_region").as[Commons.EventObj]
+      $"dest_country", $"dest_region").as[Commons.EventObj]
 
     //======================================================CASSANDRA WRITER======================================
     val writerEvent = new ForeachWriter[Commons.EventObj] {

@@ -14,14 +14,14 @@ dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-annotations" % "2
 
 // https://mvnrepository.com/artifact/org.apache.spark/spark-sql
 //libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.3.1" % "provided"
-libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.3.1"
+libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.3.1" % "provided" exclude("com.fasterxml.jackson.core", "jackson-databind")
 
 // https://mvnrepository.com/artifact/org.apache.spark/spark-sql-kafka-0-10
 libraryDependencies += "org.apache.spark" %% "spark-sql-kafka-0-10" % "2.3.1"
 
 // https://mvnrepository.com/artifact/org.apache.spark/spark-core
 //libraryDependencies += "org.apache.spark" %% "spark-core" % "2.3.1" % "provided"
-libraryDependencies += "org.apache.spark" %% "spark-core" % "2.3.1"
+libraryDependencies += "org.apache.spark" %% "spark-core" % "2.3.1" % "provided" exclude("com.fasterxml.jackson.core", "jackson-databind")
 
 libraryDependencies += "io.confluent" % "kafka-avro-serializer" % "5.0.0"
 

@@ -4,6 +4,10 @@ version := "0.1"
 
 scalaVersion := "2.11.12"
 
+assemblyShadeRules in assembly := Seq(
+  ShadeRule.rename("com.fasterxml.**" -> "shadeio.@1").inAll
+)
+
 resolvers += "confluent" at "http://packages.confluent.io/maven/"
 resolvers += "Spark Packages Repo" at "https://dl.bintray.com/spark-packages/maven"
 
@@ -41,10 +45,6 @@ libraryDependencies += "com.snowplowanalytics" %% "scala-maxmind-iplookups" % "0
 libraryDependencies += "org.typelevel" %% "cats-effect-laws" % "1.0.0" % "test"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.2"
-
-assemblyShadeRules in assembly := Seq(
-  ShadeRule.rename("com.fasterxml.**" -> "shadeio.@1").inAll
-)
 
 assemblyMergeStrategy in assembly := {
   {

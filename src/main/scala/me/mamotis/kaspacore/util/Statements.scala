@@ -15,7 +15,7 @@ object Statements {
        |"alert_msg", "classification", "priority", "sig_id", "sig_gen", "sig_rev", "src_country", "src_region", "dest_country", "dest_region")
        |values($id, '$company', '$device_id', $year, $month, $day, $hour, $minute, $second, '$protocol',
        |'$ip_type', '$src_mac', '$dest_mac', '$src_ip', '$dest_ip',$src_port, $dest_port, '$alert_msg',
-       |$classification, $priority, $sig_id, $sig_gen, $sig_rev, '$src_country', '$src_region', '$dest_country', '$dest_region' )""".stripMargin
+       |$classification, $priority, $sig_id, $sig_gen, $sig_rev, '$src_country', '$src_region', '$dest_country', '$dest_region')""".stripMargin
 
   def push_raw_data_by_device_id(id: UUID, company:String, device_id: String, year: Integer, month: Integer, day: Integer,
                                  hour: Integer, minute: Integer, second: Integer, protocol: String, ip_type: String, src_mac: String,

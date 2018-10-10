@@ -42,6 +42,10 @@ libraryDependencies += "org.typelevel" %% "cats-effect-laws" % "1.0.0" % "test"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.2"
 
+assemblyShadeRules in assembly := Seq(
+  ShadeRule.rename("com.fasterxml.**" -> "shadeio.@1").inAll
+)
+
 assemblyMergeStrategy in assembly := {
   {
     case "META-INF/services/org.apache.spark.sql.sources.DataSourceRegister" => MergeStrategy.concat

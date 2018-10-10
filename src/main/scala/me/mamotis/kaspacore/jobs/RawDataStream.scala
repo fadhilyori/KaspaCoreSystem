@@ -115,7 +115,8 @@ object RawDataStream extends Utils {
     //====================================================WRITE QUERY=================================
     val eventConsoleQuery = eventDs
       .writeStream
-      .outputMode("console")
+      .outputMode("append")
+      .format("console")
       .start().awaitTermination()
 //    val eventPushQuery = eventDs
 //      .writeStream

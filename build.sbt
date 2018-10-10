@@ -7,14 +7,21 @@ scalaVersion := "2.11.12"
 resolvers += "confluent" at "http://packages.confluent.io/maven/"
 resolvers += "Spark Packages Repo" at "https://dl.bintray.com/spark-packages/maven"
 
+dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.7"
+dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.7"
+dependencyOverrides += "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.7"
+dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-annotations" % "2.9.7"
+
 // https://mvnrepository.com/artifact/org.apache.spark/spark-sql
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.3.1" % "provided"
+//libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.3.1"
 
 // https://mvnrepository.com/artifact/org.apache.spark/spark-sql-kafka-0-10
 libraryDependencies += "org.apache.spark" %% "spark-sql-kafka-0-10" % "2.3.1"
 
 // https://mvnrepository.com/artifact/org.apache.spark/spark-core
 libraryDependencies += "org.apache.spark" %% "spark-core" % "2.3.1" % "provided"
+//libraryDependencies += "org.apache.spark" %% "spark-core" % "2.3.1"
 
 libraryDependencies += "io.confluent" % "kafka-avro-serializer" % "5.0.0"
 
@@ -45,8 +52,3 @@ assemblyMergeStrategy in assembly := {
     case x => MergeStrategy.first
   }
 }
-
-dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.7"
-dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.7"
-dependencyOverrides += "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.7"
-dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-annotations" % "2.9.7"

@@ -6,13 +6,15 @@ scalaVersion := "2.11.12"
 
 assemblyShadeRules in assembly := Seq(
   ShadeRule.rename("com.fasterxml.**" -> "shadeio.@1")
-    .inLibrary("com.fasterxml.jackson.core" % "jackson-databind" % "2.9.7")
-    .inLibrary("com.fasterxml.jackson.core" % "jackson-core" % "2.9.7")
-    .inLibrary("com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.7")
-    .inLibrary("com.fasterxml.jackson.core" % "jackson-annotations" % "2.9.7")
-    .inLibrary("com.snowplowanalytics" %% "scala-maxmind-iplookups" % "0.5.0")
-    .inLibrary("com.maxmind.geoip2" % "geoip2" % "2.11.0")
-    .inLibrary("com.maxmind.db" % "maxmind-db" % "1.2.2")
+    .inLibrary(
+      "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.7",
+      "com.fasterxml.jackson.core" % "jackson-core" % "2.9.7",
+      "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.7",
+      "com.fasterxml.jackson.core" % "jackson-annotations" % "2.9.7",
+      "com.snowplowanalytics" %% "scala-maxmind-iplookups" % "0.5.0",
+      "com.maxmind.geoip2" % "geoip2" % "2.11.0",
+      "com.maxmind.db" % "maxmind-db" % "1.2.2"
+    )
     .inProject
 )
 

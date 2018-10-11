@@ -15,16 +15,15 @@ assemblyShadeRules in assembly := Seq(
       "com.maxmind.geoip2" % "geoip2" % "2.11.0",
       "com.maxmind.db" % "maxmind-db" % "1.2.2"
     )
-    .inProject
 )
 
 resolvers += "confluent" at "http://packages.confluent.io/maven/"
 resolvers += "Spark Packages Repo" at "https://dl.bintray.com/spark-packages/maven"
 
-dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.7"
-dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.7"
-dependencyOverrides += "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.7"
-dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-annotations" % "2.9.7"
+libraryDependencies += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.7"
+libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.7"
+libraryDependencies += "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.7"
+libraryDependencies += "com.fasterxml.jackson.core" % "jackson-annotations" % "2.9.7"
 
 // https://mvnrepository.com/artifact/org.apache.spark/spark-sql
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.3.1" % "provided"

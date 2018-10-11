@@ -22,8 +22,8 @@ object Tools {
 
     result.ipLocation match {
       case Some(Right(loc)) =>
-        println(loc.countryName)
-        "TEST Country"
+        if(loc.countryName == None) "UNDEFINED"
+        else loc.countryName
       case _ =>
         "UNDEFINED"
     }
@@ -45,9 +45,8 @@ object Tools {
 
     result.ipLocation match {
       case Some(Right(loc)) =>
-//        loc.regionName.get
-        println(loc.regionName)
-        "TESTCountry"
+        if(loc.regionName == None) "UNDEFINED"
+        else loc.regionName.get
       case _ =>
         "UNDEFINED"
     }

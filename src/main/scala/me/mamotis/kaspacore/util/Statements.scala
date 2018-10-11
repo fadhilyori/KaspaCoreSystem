@@ -26,7 +26,7 @@ object Statements {
     s"""
        |INSERT INTO kaspa.raw_data_by_device_id ("id", "company", "device_id", "year", "month", "day", "hour", "minute", "second",
        |"protocol", "ip_type", "src_mac", "dest_mac", "src_ip", "dest_ip", "src_port", "dest_port",
-       |"alert_msg", "classification", "priority", "sig_id", "sig_gen", "sig_rev", "src_country", "src_region", "dest_country", "dest_region"))
+       |"alert_msg", "classification", "priority", "sig_id", "sig_gen", "sig_rev", "src_country", "src_region", "dest_country", "dest_region")
        |values($id, '$company', '$device_id', $year, $month, $day, $hour, $minute, $second, '$protocol',
        |'$ip_type', '$src_mac', '$dest_mac', '$src_ip', '$dest_ip',$src_port, $dest_port, '$alert_msg',
        |$classification, $priority, $sig_id, $sig_gen, $sig_rev, '$src_country', '$src_region', '$dest_country', '$dest_region')""".stripMargin

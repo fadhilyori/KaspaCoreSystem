@@ -69,7 +69,6 @@ object RawDataStream extends Utils {
       val sig_gen = r.getAs[Long](14).toInt
       val sig_rev = r.getAs[Long](15).toInt
       val company = r.getAs[String](16)
-      println(src_ip+":"+dest_ip)
       val src_country = Tools.IpLookupCountry(src_ip)
 //      val src_country = "Dummy Country"
       val src_region = Tools.IpLookupRegion(src_ip)
@@ -114,27 +113,27 @@ object RawDataStream extends Utils {
     }
 
     //====================================================WRITE QUERY=================================
-    val eventConsoleQuery = eventDs
-      .writeStream
-      .outputMode("append")
-      .format("console")
-      .start().awaitTermination()
-
-//    val eventPushQuery = eventDs
+//    val eventConsoleQuery = eventDs
 //      .writeStream
 //      .outputMode("append")
-//      .queryName("Event Push Cassandra")
-//      .foreach(writerEvent)
-//      .start()
-//
-//    val eventPushHDFS = eventDs
-//      .writeStream
-//      .format("json")
-//      .option("path", PropertiesLoader.hadoopEventFilePath)
-//      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
-//      .start()
-//
-//    eventPushQuery.awaitTermination()
-//    eventPushHDFS.awaitTermination()
+//      .format("console")
+//      .start().awaitTermination()
+
+    val eventPushQuery = eventDs
+      .writeStream
+      .outputMode("append")
+      .queryName("Event Push Cassandra")
+      .foreach(writerEvent)
+      .start()
+
+    val eventPushHDFS = eventDs
+      .writeStream
+      .format("json")
+      .option("path", PropertiesLoader.hadoopEventFilePath)
+      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
+      .start()
+
+    eventPushQuery.awaitTermination()
+    eventPushHDFS.awaitTermination()
   }
 }

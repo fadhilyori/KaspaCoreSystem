@@ -1,7 +1,7 @@
 package me.mamotis.kaspacore.util
 
 object Commons {
-  case class EventObj(company: String, device_id: String, year: Integer, month: Integer,
+  case class EventObj(ts: String, company: String, device_id: String, year: Integer, month: Integer,
                       day: Integer, hour: Integer, minute: Integer,
                       second: Integer, protocol: String, ip_type: String,
                       src_mac: String, dest_mac: String, src_ip: String,
@@ -11,7 +11,7 @@ object Commons {
                       sig_rev: Integer, src_country: String, src_region: String,
                       dest_country: String, dest_region: String) extends Serializable
 
-  case class EventObjTs(company: String, device_id: String, timestamp: String, protocol: String, ip_type: String,
+  case class EventObjTs(ts: String, company: String, device_id: String, timestamp: String, protocol: String, ip_type: String,
                         src_mac: String, dest_mac: String, src_ip: String,
                         dest_ip: String, src_port: Integer, dest_port: Integer,
                         alert_msg: String, classification: Integer,

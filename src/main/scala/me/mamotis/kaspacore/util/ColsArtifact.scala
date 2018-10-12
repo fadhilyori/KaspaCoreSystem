@@ -2,12 +2,12 @@ package me.mamotis.kaspacore.util
 
 object ColsArtifact {
   //  Event Hit
-  val colsEventObj = List("company", "device_id", "year", "month", "day", "hour", "minute", "second",
+  val colsEventObj = List("ts", "company", "device_id", "year", "month", "day", "hour", "minute", "second",
     "protocol", "ip_type", "src_mac", "dest_mac", "src_ip", "dest_ip",
     "src_port", "dest_port", "alert_msg", "classification", "priority",
     "sig_id", "sig_gen", "sig_rev", "src_country", "src_region", "dest_country", "dest_region")
 
-  val colsEventObjTs = List("company", "device_id", "timestamp",
+  val colsEventObjTs = List("ts", "company", "device_id", "timestamp",
     "protocol", "ip_type", "src_mac", "dest_mac", "src_ip", "dest_ip",
     "src_port", "dest_port", "alert_msg", "classification", "priority",
     "sig_id", "sig_gen", "sig_rev", "src_country", "src_region", "dest_country", "dest_region")

@@ -53,6 +53,7 @@ object RawDataStream extends Utils {
       $"dest_ip", $"src_port", $"dst_port", $"alert_msg", $"classification", $"priority", $"sig_id",
       $"sig_gen", $"sig_rev", $"company"
     ).map { r =>
+      val ts = r.getAs[String](0)
       val device_id = r.getAs[String](1)
       val protocol = r.getAs[String](2)
       val ip_type = r.getAs[String](3)
@@ -78,7 +79,7 @@ object RawDataStream extends Utils {
       val dest_region = Tools.IpLookupRegion(dest_ip)
 //      val dest_region = "Dummy City"
 
-      val date = new DateTime((r.getAs[String](0).toDouble * 1000).toLong)
+      val date = new DateTime((ts.toDouble * 1000).toLong)
       val year = date.getYear()
       val month = date.getMonthOfYear()
       val day = date.getDayOfMonth()
@@ -87,14 +88,14 @@ object RawDataStream extends Utils {
       val second = date.getSecondOfMinute()
 
       new Commons.EventObj(
-        company, device_id, year, month, day, hour, minute, second,
+        ts, company, device_id, year, month, day, hour, minute, second,
         protocol, ip_type, src_mac, dest_mac, src_ip, dest_ip,
         src_port, dest_port, alert_msg, classification, priority,
         sig_id, sig_gen, sig_rev, src_country, src_region, dest_country, dest_region
       )
     }.toDF(ColsArtifact.colsEventObj: _*)
 
-    val eventDs = eventDf.select($"company", $"device_id", $"year", $"month",
+    val eventDs = eventDf.select($"ts", $"company", $"device_id", $"year", $"month",
       $"day", $"hour", $"minute", $"second", $"protocol", $"ip_type",
       $"src_mac", $"dest_mac", $"src_ip", $"dest_ip", $"src_port",
       $"dest_port", $"alert_msg", $"classification", $"priority",
@@ -113,27 +114,27 @@ object RawDataStream extends Utils {
     }
 
     //====================================================WRITE QUERY=================================
-//    val eventConsoleQuery = eventDs
-//      .writeStream
-//      .outputMode("append")
-//      .format("console")
-//      .start().awaitTermination()
-
-    val eventPushQuery = eventDs
+    val eventConsoleQuery = eventDs
       .writeStream
       .outputMode("append")
-      .queryName("Event Push Cassandra")
-      .foreach(writerEvent)
-      .start()
+      .format("console")
+      .start().awaitTermination()
 
-    val eventPushHDFS = eventDs
-      .writeStream
-      .format("json")
-      .option("path", PropertiesLoader.hadoopEventFilePath)
-      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
-      .start()
-
-    eventPushQuery.awaitTermination()
-    eventPushHDFS.awaitTermination()
+//    val eventPushQuery = eventDs
+//      .writeStream
+//      .outputMode("append")
+//      .queryName("Event Push Cassandra")
+//      .foreach(writerEvent)
+//      .start()
+//
+//    val eventPushHDFS = eventDs
+//      .writeStream
+//      .format("json")
+//      .option("path", PropertiesLoader.hadoopEventFilePath)
+//      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
+//      .start()
+//
+//    eventPushQuery.awaitTermination()
+//    eventPushHDFS.awaitTermination()
   }
 }

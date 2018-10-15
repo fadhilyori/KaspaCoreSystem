@@ -114,27 +114,27 @@ object RawDataStream extends Utils {
     }
 
     //====================================================WRITE QUERY=================================
-//    val eventConsoleQuery = eventDs
-//      .writeStream
-//      .outputMode("append")
-//      .format("console")
-//      .start().awaitTermination()
-
-    val eventPushQuery = eventDs
+    val eventConsoleQuery = eventDs
       .writeStream
       .outputMode("append")
-      .queryName("Event Push Cassandra")
-      .foreach(writerEvent)
-      .start()
+      .format("console")
+      .start().awaitTermination()
 
-    val eventPushHDFS = eventDs
-      .writeStream
-      .format("json")
-      .option("path", PropertiesLoader.hadoopEventFilePath)
-      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
-      .start()
-
-    eventPushQuery.awaitTermination()
-    eventPushHDFS.awaitTermination()
+//    val eventPushQuery = eventDs
+//      .writeStream
+//      .outputMode("append")
+//      .queryName("Event Push Cassandra")
+//      .foreach(writerEvent)
+//      .start()
+//
+//    val eventPushHDFS = eventDs
+//      .writeStream
+//      .format("json")
+//      .option("path", PropertiesLoader.hadoopEventFilePath)
+//      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
+//      .start()
+//
+//    eventPushQuery.awaitTermination()
+//    eventPushHDFS.awaitTermination()
   }
 }

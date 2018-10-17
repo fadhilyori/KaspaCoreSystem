@@ -42,20 +42,8 @@ object DailyHitCount extends Utils {
     import sparkSession.implicits._
     sparkContext.setLogLevel("ERROR")
 
-    val df = sparkSession
-        .readStream
-        .format("json")
-        .schema(schema)
-        .load(PropertiesLoader.hadoopEventFilePath)
-
+    val df = sparkSession.read.json(PropertiesLoader.hadoopEventFilePath)
 
     df.show(10)
-    df.printSchema()
-
-    df.writeStream
-      .format("console")
-      .outputMode("append")
-      .start()
-      .awaitTermination()
   }
 }

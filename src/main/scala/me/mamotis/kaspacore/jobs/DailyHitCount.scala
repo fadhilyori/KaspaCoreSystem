@@ -2,6 +2,7 @@ package me.mamotis.kaspacore.jobs
 
 import me.mamotis.kaspacore.util.PropertiesLoader
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.functions.{lit}
 
 object DailyHitCount extends Utils {
 
@@ -42,8 +43,10 @@ object DailyHitCount extends Utils {
     import sparkSession.implicits._
     sparkContext.setLogLevel("ERROR")
 
-    val df = sparkSession.read.json(PropertiesLoader.hadoopEventFilePath)
+    val rawDf = sparkSession.read.json(PropertiesLoader.hadoopEventFilePath)
+    val countedDf = rawDf.withColumn("val", lit(1))
+      .groupBy($"company").sum("value")
 
-    df.show(10)
+    countedDf.show(10)
   }
 }

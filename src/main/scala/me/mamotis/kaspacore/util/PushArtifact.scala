@@ -308,7 +308,7 @@ object PushArtifact {
   def pushProtocolByDPortHitDeviceIdMin(value: Commons.ProtocolByDPortHitDeviceIdObjMin, connector: CassandraConnector) = {
     connector.withSessionDo{
       session =>
-        session.execute(Statements.push_protocol_by_dport_hit_device_id_minute(value.device_id, value.protocol, value.dst_port,value.year, value.month, value.day, value.hour,
+        session.execute(Statements.push_protocol_by_dport_hit_device_id_minute(value.device_id, value.protocol, value.dest_port,value.year, value.month, value.day, value.hour,
           value.minute, value.value))
     }
   }

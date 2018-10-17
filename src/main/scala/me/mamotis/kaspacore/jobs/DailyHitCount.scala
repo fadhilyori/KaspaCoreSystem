@@ -48,8 +48,14 @@ object DailyHitCount extends Utils {
         .schema(schema)
         .load(PropertiesLoader.hadoopEventFilePath)
 
+
+    df.show(10)
     df.printSchema()
 
-    df.writeStream.format("console").start().awaitTermination()
+    df.writeStream
+      .format("console")
+      .outputMode("append")
+      .start()
+      .awaitTermination()
   }
 }

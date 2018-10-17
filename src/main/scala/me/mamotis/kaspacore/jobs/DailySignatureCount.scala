@@ -66,18 +66,18 @@ object DailySignatureCount extends Utils {
     // ======================================Device ID===============================
 
     // ======================================Query===============================
-//    pushSignatureCompanyDf
-//      .write
-//      .format("org.apache.spark.sql.cassandra")
-//      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "signature_hit_on_company_day"))
-//      .mode(SaveMode.Overwrite)
-//      .save()
-//
-//    pushSignatureDeviceIdDf
-//      .write
-//      .format("org.apache.spark.sql.cassandra")
-//      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "signature_hit_on_device_id_day"))
-//      .mode(SaveMode.Overwrite)
-//      .save()
+    pushSignatureCompanyDf
+      .write
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "signature_hit_on_company_day"))
+      .mode(SaveMode.Overwrite)
+      .save()
+
+    pushSignatureDeviceIdDf
+      .write
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "signature_hit_on_device_id_day"))
+      .mode(SaveMode.Overwrite)
+      .save()
   }
 }

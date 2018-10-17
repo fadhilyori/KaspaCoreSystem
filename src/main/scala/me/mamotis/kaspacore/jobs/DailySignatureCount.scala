@@ -3,7 +3,6 @@ package me.mamotis.kaspacore.jobs
 import me.mamotis.kaspacore.util.{ColsArtifact, Commons, PropertiesLoader, PushArtifact}
 import java.time.LocalDate
 
-import org.apache.spark.sql.ForeachWriter
 import org.apache.spark.sql.functions.{desc, lit}
 
 object DailySignatureCount extends Utils {
@@ -31,33 +30,13 @@ object DailySignatureCount extends Utils {
       .groupBy($"company", $"alert_msg")
       .count().orderBy(desc("count"))
 
-    val pushSignatureCompanyDf = countedSignatureCompanyDf.map{
-      r =>
-        val company = r.getAs[String](0)
-        val alert_msg = r.getAs[String](1)
-        val value = r.getAs[Long](2)
-        val year = LocalDate.now.getYear()
-        val month = LocalDate.now.getMonthValue()
-        val day = LocalDate.now.getDayOfMonth()
+    val pushSignatureCompanyDf = countedSignatureCompanyDf
+      .withColumn("year", lit(LocalDate.now.getYear))
+      .withColumn("month", lit(LocalDate.now.getMonthValue))
+      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
 
-        new Commons.SignatureHitCompanyObjDay(
-          company, alert_msg, year, month, day, value
-        )
-    }.toDF(ColsArtifact.colsSignatureHitCompanyObjDay: _*)
+    pushSignatureCompanyDf.show()
 
-    val pushSignatureCompanyDs = pushSignatureCompanyDf
-      .select($"company", $"alert_msg", $"year", $"month", $"day", $"value")
-      .as[Commons.SignatureHitCompanyObjDay]
-
-    val writerSignatureHitCompany = new ForeachWriter[Commons.SignatureHitCompanyObjDay] {
-      override def open(partitionId: Long, version: Long): Boolean = true
-
-      override def process(value: Commons.SignatureHitCompanyObjDay): Unit = {
-        PushArtifact.pushSignatureHitCompanyDay(value, connector)
-      }
-
-      override def close(errorOrNull: Throwable): Unit = {}
-    }
     // ======================================Company===============================
 
 
@@ -72,50 +51,16 @@ object DailySignatureCount extends Utils {
       .groupBy($"device_id", $"alert_msg")
       .count().orderBy(desc("count"))
 
-    val pushSignatureDeviceIdDf = countedSignatureDeviceIdDf.map{
-      r =>
-        val device_id = r.getAs[String](0)
-        val alert_msg = r.getAs[String](1)
-        val value = r.getAs[Long](2)
-        val year = LocalDate.now.getYear()
-        val month = LocalDate.now.getMonthValue()
-        val day = LocalDate.now.getDayOfMonth()
+    val pushSignatureDeviceIdDf = countedSignatureDeviceIdDf
+      .withColumn("year", lit(LocalDate.now.getYear))
+      .withColumn("month", lit(LocalDate.now.getMonthValue))
+      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
 
-        new Commons.SignatureHitDeviceIdObjDay(
-          device_id, alert_msg, year, month, day, value
-        )
-    }.toDF(ColsArtifact.colsSignatureHitDeviceIdObjDay: _*)
+    pushSignatureDeviceIdDf.show()
 
-    val pushSignatureDeviceIdDs = pushSignatureDeviceIdDf
-      .select($"device_id", $"alert_msg", $"year", $"month", $"day", $"value")
-      .as[Commons.SignatureHitDeviceIdObjDay]
 
-    val writerSignatureHitDeviceId = new ForeachWriter[Commons.SignatureHitDeviceIdObjDay] {
-      override def open(partitionId: Long, version: Long): Boolean = true
-
-      override def process(value: Commons.SignatureHitDeviceIdObjDay): Unit = {
-        PushArtifact.pushSignatureHitDeviceIdDay(value, connector)
-      }
-
-      override def close(errorOrNull: Throwable): Unit = {}
-    }
     // ======================================Device ID===============================
 
     // ======================================Query===============================
-    val signatureHitCompanyDailyQuery = pushSignatureCompanyDs
-      .writeStream
-      .outputMode("complete")
-      .queryName("Signature Hit Company Daily")
-      .foreach(writerSignatureHitCompany)
-      .start()
-
-    val signatureHitDeviceIdDailyQuery = pushSignatureDeviceIdDs
-      .writeStream.outputMode("complete")
-      .queryName("Signature Hit Device ID Daily")
-      .foreach(writerSignatureHitDeviceId)
-      .start()
-
-    signatureHitCompanyDailyQuery.awaitTermination()
-    signatureHitDeviceIdDailyQuery.awaitTermination()
   }
 }

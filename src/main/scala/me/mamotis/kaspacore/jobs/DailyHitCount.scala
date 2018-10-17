@@ -45,7 +45,7 @@ object DailyHitCount extends Utils {
 
     val rawDf = sparkSession.read.json(PropertiesLoader.hadoopEventFilePath)
     val countedDf = rawDf.withColumn("val", lit(1))
-      .groupBy($"company").sum("value")
+      .groupBy($"company").sum("val")
 
     countedDf.show(10)
   }

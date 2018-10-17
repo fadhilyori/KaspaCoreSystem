@@ -15,9 +15,11 @@ object DailyHitCount extends Utils {
 
     val df = sparkSession
         .readStream
-        .schema(sparkSession.read.json(PropertiesLoader.hadoopSchemaFilePath).schema).json(PropertiesLoader.hadoopEventFilePath)
+        .format("json")
+        .schema(sparkSession.read.json(PropertiesLoader.hadoopSchemaFilePath).schema)
+        .load(PropertiesLoader.hadoopEventFilePath)
 
-    df.show()
+    df.writeStream.format("console").start().awaitTermination()
 
   }
 }

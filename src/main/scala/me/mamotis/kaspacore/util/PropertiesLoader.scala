@@ -20,6 +20,7 @@ object PropertiesLoader {
   val GeoIpFilename = conf.getString("GEOIP_FILENAME")
 
   val hadoopEventFilePath = conf.getString("HADOOP_EVENT_FILE_PATH")
+  val hadoopSchemaFilePath = conf.getString("HADOOP_SCHEMA_FILE_PATH")
   val checkpointLocation = conf.getString("CHECKPOINT_LOCATION")
 
   val cassandraUsername = conf.getString("CASSANDRA_USERNAME")

@@ -14,8 +14,8 @@ object DailyHitCount extends Utils {
     sparkContext.setLogLevel("ERROR")
 
     val df = sparkSession
-      .read
-      .json(PropertiesLoader.hadoopEventFilePath)
+        .readStream
+        .schema(sparkSession.read.json(PropertiesLoader.hadoopSchemaFilePath).schema).json(PropertiesLoader.hadoopEventFilePath)
 
     df.show()
 

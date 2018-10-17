@@ -3,6 +3,7 @@ package me.mamotis.kaspacore.jobs
 import me.mamotis.kaspacore.util.{ColsArtifact, Commons, PropertiesLoader, PushArtifact}
 import java.time.LocalDate
 
+import org.apache.spark.sql.SaveMode
 import org.apache.spark.sql.functions.{desc, lit}
 
 object DailySignatureCount extends Utils {
@@ -18,19 +19,23 @@ object DailySignatureCount extends Utils {
 
     // Raw Event Dataframe Parsing
     val rawDf = sparkSession.read.json(PropertiesLoader.hadoopEventFilePath)
-
-    // ======================================Company===============================
-    val filteredEventsCompanyDf = rawDf
-      .select($"company", $"alert_msg", $"year", $"month", $"day")
+      .select($"company", $"device_id", $"alert_msg", $"year", $"month", $"day")
       .filter($"year" === LocalDate.now.getYear)
       .filter($"month" === LocalDate.now.getMonthValue)
       .filter($"day" === LocalDate.now.getDayOfMonth)
+      .cache()
 
-    val countedSignatureCompanyDf = filteredEventsCompanyDf
+    // ======================================Company==============================
+    val countedSignatureCompanyDf = rawDf
       .groupBy($"company", $"alert_msg")
-      .count().orderBy(desc("count"))
+      .count()
+      .sort($"company".desc, $"count".desc)
 
     val pushSignatureCompanyDf = countedSignatureCompanyDf
+      .select(
+        $"company", $"alert_msg",
+        $"count".alias("value").as[Long]
+      )
       .withColumn("year", lit(LocalDate.now.getYear))
       .withColumn("month", lit(LocalDate.now.getMonthValue))
       .withColumn("day", lit(LocalDate.now.getDayOfMonth))
@@ -41,17 +46,16 @@ object DailySignatureCount extends Utils {
 
 
     // ======================================Device ID===============================
-    val filteredEventsDeviceIdDf = rawDf
-      .select($"device_id", $"alert_msg", $"year", $"month", $"day")
-      .filter($"year" === LocalDate.now.getYear)
-      .filter($"month" === LocalDate.now.getMonthValue)
-      .filter($"day" === LocalDate.now.getDayOfMonth)
-
-    val countedSignatureDeviceIdDf = filteredEventsDeviceIdDf
+    val countedSignatureDeviceIdDf = rawDf
       .groupBy($"device_id", $"alert_msg")
-      .count().orderBy(desc("count"))
+      .count()
+      .sort($"device_id".desc, $"count".desc)
 
     val pushSignatureDeviceIdDf = countedSignatureDeviceIdDf
+      .select(
+        $"device_id", $"alert_msg",
+        $"count".alias("value").as[Long]
+      )
       .withColumn("year", lit(LocalDate.now.getYear))
       .withColumn("month", lit(LocalDate.now.getMonthValue))
       .withColumn("day", lit(LocalDate.now.getDayOfMonth))
@@ -62,5 +66,18 @@ object DailySignatureCount extends Utils {
     // ======================================Device ID===============================
 
     // ======================================Query===============================
+//    pushSignatureCompanyDf
+//      .write
+//      .format("org.apache.spark.sql.cassandra")
+//      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "signature_hit_on_company_day"))
+//      .mode(SaveMode.Overwrite)
+//      .save()
+//
+//    pushSignatureDeviceIdDf
+//      .write
+//      .format("org.apache.spark.sql.cassandra")
+//      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "signature_hit_on_device_id_day"))
+//      .mode(SaveMode.Overwrite)
+//      .save()
   }
 }

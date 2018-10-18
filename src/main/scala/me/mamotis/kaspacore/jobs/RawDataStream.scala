@@ -392,6 +392,7 @@ object RawDataStream extends Utils {
     val eventHitCompanySecKafkaQuery = eventHitCompanySecDs
       .writeStream
       .format("kafka")
+      .outputMode("update")
       .option("kafka.bootstrap.servers", PropertiesLoader.kafkaBrokerUrlOutput)
       .option("topic", PropertiesLoader.kafkaOutputTopic)
       .option("checkpointLocation", PropertiesLoader.kafkaCheckpointLocation)

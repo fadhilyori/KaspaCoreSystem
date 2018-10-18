@@ -389,6 +389,13 @@ object RawDataStream extends Utils {
       .foreach(writerEventHitCompanySec)
       .start()
 
+    val eventHitCompanySecKafkaQuery = eventHitCompanySecDs
+      .writeStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", PropertiesLoader.kafkaBrokerUrlOutput)
+      .option("topic", PropertiesLoader.kafkaOutputTopic)
+      .start()
+
     val eventHitCompanyMinQuery = eventHitCompanyMinDs
       .writeStream
       .outputMode("update")
@@ -426,6 +433,7 @@ object RawDataStream extends Utils {
 
     eventPushQuery.awaitTermination()
     eventPushHDFS.awaitTermination()
+    eventHitCompanySecKafkaQuery.awaitTermination()
     eventHitCompanySecQuery.awaitTermination()
     eventHitCompanyMinQuery.awaitTermination()
     eventHitCompanyHourQuery.awaitTermination()

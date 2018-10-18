@@ -10,6 +10,8 @@ object PropertiesLoader {
   val schemaRegistryUrl: String = conf.getString("SCHEMA_REGISTRY_URL")
   val kafkaInputTopic: String = conf.getString("KAFKA_INPUT_TOPIC")
   val kafkaStartingOffset: String = conf.getString("KAFKA_STARTING_OFFSET")
+  val kafkaBrokerUrlOutput: String = conf.getString("KAFKA_BROKER_URL_OUTPUT")
+  val kafkaOutputTopic: String = conf.getString("KAFKA_OUTPUT_TOPIC")
 
   val sparkMaster: String = conf.getString("SPARK_MASTER")
   val sparkAppName: String = conf.getString("SPARK_APP_NAME")

@@ -135,6 +135,67 @@ object RawDataStream extends Utils {
     val eventHitCompanySecDs = eventHitCompanySecDf_2.select($"company", $"year",
       $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.EventHitCompanyObjSec]
 
+    //+++++Minute
+    val eventHitCompanyMinDf_1 = parsedRawDf.select(to_utc_timestamp(
+      from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType), $"company").withColumn("value", lit(1)
+    ).groupBy(
+      $"company",
+      window($"timestamp", "1 minutes").alias("windows")
+    ).sum("value")
+
+    val eventHitCompanyMinDf_2 = eventHitCompanyMinDf_1.select($"company", $"windows.start" , $"sum(value)").map{
+      r =>
+        val company = r.getAs[String](0)
+
+        val epoch = r.getAs[Timestamp](1).getTime
+
+        val date = new DateTime(epoch)
+        val year = date.getYear()
+        val month = date.getMonthOfYear()
+        val day = date.getDayOfMonth()
+        val hour = date.getHourOfDay()
+        val minute = date.getMinuteOfHour()
+
+        val value = r.getAs[Long](2)
+
+        new Commons.EventHitCompanyObjMin(
+          company, year, month, day, hour, minute, value
+        )
+    }.toDF(ColsArtifact.colsEventHitCompanyObjMin: _*)
+
+    val eventHitCompanyMinDs = eventHitCompanyMinDf_2.select($"company", $"year",
+      $"month", $"day", $"hour", $"minute", $"value").as[Commons.EventHitCompanyObjMin]
+
+    //+++++Hour
+    val eventHitCompanyHourDf_1 = parsedRawDf.select(to_utc_timestamp(
+      from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType), $"company").withColumn("value", lit(1)
+    ).groupBy(
+      $"company",
+      window($"timestamp", "1 hours").alias("windows")
+    ).sum("value")
+
+    val eventHitCompanyHourDf_2 = eventHitCompanyHourDf_1.select($"company", $"windows.start" , $"sum(value)").map{
+      r =>
+        val company = r.getAs[String](0)
+
+        val epoch = r.getAs[Timestamp](1).getTime
+
+        val date = new DateTime(epoch)
+        val year = date.getYear()
+        val month = date.getMonthOfYear()
+        val day = date.getDayOfMonth()
+        val hour = date.getHourOfDay()
+
+        val value = r.getAs[Long](2)
+
+        new Commons.EventHitCompanyObjHour(
+          company, year, month, day, hour, value
+        )
+    }.toDF(ColsArtifact.colsEventHitCompanyObjHour: _*)
+
+    val eventHitCompanyHourDs = eventHitCompanyHourDf_2.select($"company", $"year",
+      $"month", $"day", $"hour", $"value").as[Commons.EventHitCompanyObjHour]
+
     //+++++++++++++Push Event Hit DeviceId per Second++++++++++++++++++++++
     //+++++Second
     val eventHitDeviceIdSecDf_1 = parsedRawDf.select(to_utc_timestamp(
@@ -168,6 +229,67 @@ object RawDataStream extends Utils {
     val eventHitDeviceIdSecDs = eventHitDeviceIdSecDf_2.select($"device_id", $"year",
       $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.EventHitDeviceIdObjSec]
 
+    //+++++Minute
+    val eventHitDeviceIdMinDf_1 = parsedRawDf.select(to_utc_timestamp(
+      from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType), $"device_id").withColumn("value", lit(1)
+    ).groupBy(
+      $"device_id",
+      window($"timestamp", "1 minutes").alias("windows")
+    ).sum("value")
+
+    val eventHitDeviceIdMinDf_2 = eventHitDeviceIdMinDf_1.select($"device_id", $"windows.start" , $"sum(value)").map{
+      r =>
+        val device_id = r.getAs[String](0)
+
+        val epoch = r.getAs[Timestamp](1).getTime
+
+        val date = new DateTime(epoch)
+        val year = date.getYear()
+        val month = date.getMonthOfYear()
+        val day = date.getDayOfMonth()
+        val hour = date.getHourOfDay()
+        val minute = date.getMinuteOfHour()
+
+        val value = r.getAs[Long](2)
+
+        new Commons.EventHitDeviceIdObjMin(
+          device_id, year, month, day, hour, minute, value
+        )
+    }.toDF(ColsArtifact.colsEventHitDeviceIdObjMin: _*)
+
+    val eventHitDeviceIdMinDs = eventHitDeviceIdMinDf_2.select($"device_id", $"year",
+      $"month", $"day", $"hour", $"minute", $"value").as[Commons.EventHitDeviceIdObjMin]
+
+    //+++++Hour
+    val eventHitDeviceIdHourDf_1 = parsedRawDf.select(to_utc_timestamp(
+      from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType), $"device_id").withColumn("value", lit(1)
+    ).groupBy(
+      $"device_id",
+      window($"timestamp", "1 hours").alias("windows")
+    ).sum("value")
+
+    val eventHitDeviceIdHourDf_2 = eventHitDeviceIdHourDf_1.select($"device_id", $"windows.start" , $"sum(value)").map{
+      r =>
+        val device_id = r.getAs[String](0)
+
+        val epoch = r.getAs[Timestamp](1).getTime
+
+        val date = new DateTime(epoch)
+        val year = date.getYear()
+        val month = date.getMonthOfYear()
+        val day = date.getDayOfMonth()
+        val hour = date.getHourOfDay()
+
+        val value = r.getAs[Long](2)
+
+        new Commons.EventHitDeviceIdObjHour(
+          device_id, year, month, day, hour, value
+        )
+    }.toDF(ColsArtifact.colsEventHitDeviceIdObjHour: _*)
+
+    val eventHitDeviceIdHourDs = eventHitDeviceIdHourDf_2.select($"device_id", $"year",
+      $"month", $"day", $"hour", $"value").as[Commons.EventHitDeviceIdObjHour]
+
     //======================================================CASSANDRA WRITER======================================
     val writerEvent = new ForeachWriter[Commons.EventObj] {
       override def open(partitionId: Long, version: Long): Boolean = true
@@ -189,11 +311,51 @@ object RawDataStream extends Utils {
       override def close(errorOrNull: Throwable): Unit = {}
     }
 
+    val writerEventHitCompanyMin = new ForeachWriter[Commons.EventHitCompanyObjMin] {
+      override def open(partitionId: Long, version: Long): Boolean = true
+
+      override def process(value: Commons.EventHitCompanyObjMin): Unit = {
+        PushArtifact.pushEventHitCompanyMin(value, connector)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {}
+    }
+
+    val writerEventHitCompanyHour = new ForeachWriter[Commons.EventHitCompanyObjHour] {
+      override def open(partitionId: Long, version: Long): Boolean = true
+
+      override def process(value: Commons.EventHitCompanyObjHour): Unit = {
+        PushArtifact.pushEventHitCompanyHour(value, connector)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {}
+    }
+
     val writerEventHitDeviceIdSec = new ForeachWriter[Commons.EventHitDeviceIdObjSec] {
       override def open(partitionId: Long, version: Long): Boolean = true
 
       override def process(value: Commons.EventHitDeviceIdObjSec): Unit = {
         PushArtifact.pushEventHitDeviceIdSec(value, connector)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {}
+    }
+
+    val writerEventHitDeviceIdMin = new ForeachWriter[Commons.EventHitDeviceIdObjMin] {
+      override def open(partitionId: Long, version: Long): Boolean = true
+
+      override def process(value: Commons.EventHitDeviceIdObjMin): Unit = {
+        PushArtifact.pushEventHitDeviceIdMin(value, connector)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {}
+    }
+
+    val writerEventHitDeviceIdHour = new ForeachWriter[Commons.EventHitDeviceIdObjHour] {
+      override def open(partitionId: Long, version: Long): Boolean = true
+
+      override def process(value: Commons.EventHitDeviceIdObjHour): Unit = {
+        PushArtifact.pushEventHitDeviceIdHour(value, connector)
       }
 
       override def close(errorOrNull: Throwable): Unit = {}
@@ -227,6 +389,20 @@ object RawDataStream extends Utils {
       .foreach(writerEventHitCompanySec)
       .start()
 
+    val eventHitCompanyMinQuery = eventHitCompanyMinDs
+      .writeStream
+      .outputMode("update")
+      .queryName("EventHitCompanyPerMin")
+      .foreach(writerEventHitCompanyMin)
+      .start()
+
+    val eventHitCompanyHourQuery = eventHitCompanyHourDs
+      .writeStream
+      .outputMode("update")
+      .queryName("EventHitCompanyPerHour")
+      .foreach(writerEventHitCompanyHour)
+      .start()
+
     val eventHitDeviceIdSecQuery = eventHitDeviceIdSecDs
       .writeStream
       .outputMode("update")
@@ -234,9 +410,27 @@ object RawDataStream extends Utils {
       .foreach(writerEventHitDeviceIdSec)
       .start()
 
+    val eventHitDeviceIdMinQuery = eventHitDeviceIdMinDs
+      .writeStream
+      .outputMode("update")
+      .queryName("EventHitDeviceIdPerMin")
+      .foreach(writerEventHitDeviceIdMin)
+      .start()
+
+    val eventHitDeviceIdHourQuery = eventHitDeviceIdHourDs
+      .writeStream
+      .outputMode("update")
+      .queryName("EventHitDeviceIdPerHour")
+      .foreach(writerEventHitDeviceIdHour)
+      .start()
+
     eventPushQuery.awaitTermination()
     eventPushHDFS.awaitTermination()
     eventHitCompanySecQuery.awaitTermination()
+    eventHitCompanyMinQuery.awaitTermination()
+    eventHitCompanyHourQuery.awaitTermination()
     eventHitDeviceIdSecQuery.awaitTermination()
+    eventHitDeviceIdMinQuery.awaitTermination()
+    eventHitDeviceIdHourQuery.awaitTermination()
   }
 }

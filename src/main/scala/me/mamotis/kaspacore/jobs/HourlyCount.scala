@@ -40,6 +40,7 @@ object HourlyCount extends Utils {
         $"company",
         $"count".alias("value").as[Long]
       )
+      .na.fill(Map("src_country" -> "UNDEFINED", "dest_country" -> "UNDEFINED"))
       .withColumn("year", lit(LocalDate.now.getYear))
       .withColumn("month", lit(LocalDate.now.getMonthValue))
       .withColumn("day", lit(LocalDate.now.getDayOfMonth))
@@ -113,13 +114,13 @@ object HourlyCount extends Utils {
 
     //IpSrc
     val countedIpSrcCompanyDf = rawDf
-      .groupBy($"company", $"src_ip")
+      .groupBy($"company", $"src_country", $"src_ip")
       .count()
       .sort($"company".desc, $"count".desc)
 
     val pushIpSrcCompanyDf = countedIpSrcCompanyDf
       .select(
-        $"company", $"src_ip",
+        $"company", $"src_country", $"src_ip",
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
@@ -129,13 +130,13 @@ object HourlyCount extends Utils {
 
     //IpDest
     val countedIpDestCompanyDf = rawDf
-      .groupBy($"company", $"dest_ip")
+      .groupBy($"company", $"dest_country", $"dest_ip")
       .count()
       .sort($"company".desc, $"count".desc)
 
     val pushIpDestCompanyDf = countedIpDestCompanyDf
       .select(
-        $"company", $"dest_ip",
+        $"company", $"dest_country", $"dest_ip",
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))

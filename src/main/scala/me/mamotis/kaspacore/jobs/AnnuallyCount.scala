@@ -20,6 +20,7 @@ object AnnuallyCount extends Utils {
     val rawDf = sparkSession.read.json(PropertiesLoader.hadoopEventFilePath)
       .select($"company", $"device_id", $"protocol", $"src_port", $"dest_port", $"src_ip", $"dest_ip", $"src_country",
         $"dest_country", $"alert_msg", $"year")
+      .na.fill(Map("src_country" -> "UNDEFINED", "dest_country" -> "UNDEFINED"))
       .filter($"year" === LocalDate.now.getYear)
       .filter($"month" === LocalDate.now.getMonthValue)
       .filter($"day" === LocalDate.now.getDayOfMonth)
@@ -103,13 +104,13 @@ object AnnuallyCount extends Utils {
 
     //IpSrc
     val countedIpSrcCompanyDf = rawDf
-      .groupBy($"company", $"src_ip")
+      .groupBy($"company", $"src_country", $"src_ip")
       .count()
       .sort($"company".desc, $"count".desc)
 
     val pushIpSrcCompanyDf = countedIpSrcCompanyDf
       .select(
-        $"company", $"src_ip",
+        $"company", $"src_country", $"src_ip",
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
@@ -118,13 +119,13 @@ object AnnuallyCount extends Utils {
 
     //IpDest
     val countedIpDestCompanyDf = rawDf
-      .groupBy($"company", $"dest_ip")
+      .groupBy($"company", $"dest_country", $"dest_ip")
       .count()
       .sort($"company".desc, $"count".desc)
 
     val pushIpDestCompanyDf = countedIpDestCompanyDf
       .select(
-        $"company", $"dest_ip",
+        $"company", $"dest_country", $"dest_ip",
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))

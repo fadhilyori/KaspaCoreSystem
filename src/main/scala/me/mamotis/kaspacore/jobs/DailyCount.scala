@@ -18,7 +18,9 @@ object DailyCount extends Utils {
     sparkContext.setLogLevel("ERROR")
 
     // Raw Event Dataframe Parsing
-    val rawDf = sparkSession.read.json(PropertiesLoader.hadoopEventFilePath)
+    val rawDf = sparkSession
+      .read.options(Map("samplingRatio" -> "0.1"))
+      .json(PropertiesLoader.hadoopEventFilePath)
       .select($"company", $"device_id", $"protocol", $"src_port", $"dest_port", $"src_ip", $"dest_ip", $"src_country",
         $"dest_country", $"alert_msg", $"year", $"month", $"day")
       .na.fill(Map("src_country" -> "UNDEFINED", "dest_country" -> "UNDEFINED"))
@@ -251,7 +253,7 @@ object DailyCount extends Utils {
 
     val pushIpSrcDeviceIdDf = countedIpSrcDeviceIdDf
       .select(
-        $"device_id", $"src_country", $"src_ip",
+        $"device_id", $"src_country".alias("country").as[String], $"src_ip",
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
@@ -266,7 +268,7 @@ object DailyCount extends Utils {
 
     val pushIpDestDeviceIdDf = countedIpDestDeviceIdDf
       .select(
-        $"device_id", $"dest_country", $"dest_ip",
+        $"device_id",$"dest_country".alias("country").as[String], $"dest_ip",
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))

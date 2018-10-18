@@ -19,7 +19,9 @@ object HourlyCount extends Utils {
     sparkContext.setLogLevel("ERROR")
 
     // Raw Event Dataframe Parsing
-    val rawDf = sparkSession.read.json(PropertiesLoader.hadoopEventFilePath)
+    val rawDf = sparkSession
+      .read.options(Map("samplingRatio" -> "0.1"))
+      .json(PropertiesLoader.hadoopEventFilePath)
       .select($"company", $"device_id", $"protocol", $"src_port", $"dest_port", $"src_ip", $"dest_ip", $"src_country",
         $"dest_country", $"alert_msg", $"year", $"month", $"day", $"hour")
       .filter($"year" === LocalDate.now.getYear)
@@ -268,13 +270,13 @@ object HourlyCount extends Utils {
 
     //IpSrc
     val countedIpSrcDeviceIdDf = rawDf
-      .groupBy($"device_id", $"src_ip")
+      .groupBy($"device_id", $"src_country", $"src_ip")
       .count()
       .sort($"device_id".desc, $"count".desc)
 
     val pushIpSrcDeviceIdDf = countedIpSrcDeviceIdDf
       .select(
-        $"device_id", $"src_ip",
+        $"device_id", $"src_country".alias("country").as[String], $"src_ip",
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
@@ -285,13 +287,13 @@ object HourlyCount extends Utils {
 
     //IpDest
     val countedIpDestDeviceIdDf = rawDf
-      .groupBy($"device_id", $"dest_ip")
+      .groupBy($"device_id", $"dest_country", $"dest_ip")
       .count()
       .sort($"device_id".desc, $"count".desc)
 
     val pushIpDestDeviceIdDf = countedIpDestDeviceIdDf
       .select(
-        $"device_id", $"dest_ip",
+        $"device_id", $"dest_country".alias("country").as[String], $"dest_ip",
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))

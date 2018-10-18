@@ -18,6 +18,8 @@ private[jobs] trait Utils {
       .set("spark.cassandra.connection.host", PropertiesLoader.sparkCassandraConnectionHost)
       .set("spark.cassandra.auth.username", PropertiesLoader.cassandraUsername)
       .set("spark.cassandra.auth.password", PropertiesLoader.cassandraPassword)
+      .set("spark.cassandra.output.batch.grouping.key", "Partition")
+      .set("spark.cassandra.output.concurrent.writes", "2000")
 
     val session = SparkSession.builder()
       .config(conf)

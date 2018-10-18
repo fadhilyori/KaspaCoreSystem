@@ -62,7 +62,7 @@ object Statements {
   def push_event_hit_device_id_second(device_id: String, year: Integer, month: Integer, day: Integer, hour: Integer, minute: Integer,
                                       second: Integer, value: Long): String =
     s"""
-       |INSERT INTO kaspa.event_hit_on_device_id_sec ("device_id", "year", "month", "day",
+       |INSERT INTO kaspa.event_hit_on_device_id_second ("device_id", "year", "month", "day",
        |"hour", "minute", "second", "value") values ('$device_id', $year, $month,
        |$day, $hour, $minute, $second, $value)
                                        """.stripMargin
@@ -70,7 +70,7 @@ object Statements {
   def push_event_hit_device_id_minute(device_id: String, year: Integer, month: Integer, day: Integer, hour: Integer, minute: Integer,
                                       value: Long): String =
     s"""
-       |INSERT INTO kaspa.event_hit_on_device_id_minute ("device_id", "year", "month", "day",
+       |INSERT INTO kaspa.event_hit_on_device_id_min ("device_id", "year", "month", "day",
        |"hour", "minute", "value") values ('$device_id', $year, $month,
        |$day, $hour, $minute, $value)
                                        """.stripMargin

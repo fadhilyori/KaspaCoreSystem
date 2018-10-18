@@ -120,7 +120,7 @@ object HourlyCount extends Utils {
 
     val pushIpSrcCompanyDf = countedIpSrcCompanyDf
       .select(
-        $"company", $"src_country", $"src_ip",
+        $"company", $"src_country".alias("country").as[String], $"src_ip",
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
@@ -136,7 +136,7 @@ object HourlyCount extends Utils {
 
     val pushIpDestCompanyDf = countedIpDestCompanyDf
       .select(
-        $"company", $"dest_country", $"dest_ip",
+        $"company", $"dest_country".alias("country").as[String], $"dest_ip",
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))

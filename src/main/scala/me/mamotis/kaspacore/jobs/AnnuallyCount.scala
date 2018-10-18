@@ -110,7 +110,7 @@ object AnnuallyCount extends Utils {
 
     val pushIpSrcCompanyDf = countedIpSrcCompanyDf
       .select(
-        $"company", $"src_country", $"src_ip",
+        $"company", $"src_country".alias("country").as[String], $"src_ip",
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))

@@ -17,7 +17,10 @@ object AnnuallyCount extends Utils {
     import sparkSession.implicits._
     sparkContext.setLogLevel("ERROR")
 
-    val rawDf = sparkSession.read.json(PropertiesLoader.hadoopEventFilePath)
+    val rawDf = sparkSession
+      .read
+        .options(Map("samplingRatio" -> "0.1"))
+      .json(PropertiesLoader.hadoopEventFilePath)
       .select($"company", $"device_id", $"protocol", $"src_port", $"dest_port", $"src_ip", $"dest_ip", $"src_country",
         $"dest_country", $"alert_msg", $"year")
       .na.fill(Map("src_country" -> "UNDEFINED", "dest_country" -> "UNDEFINED"))

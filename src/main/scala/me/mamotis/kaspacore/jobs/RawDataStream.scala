@@ -135,6 +135,11 @@ object RawDataStream extends Utils {
     val eventHitCompanySecDs = eventHitCompanySecDf_2.select($"company", $"year",
       $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.EventHitCompanyObjSec]
 
+    val eventHitCompanySecKafkaDs = eventHitCompanySecDf_2
+      .withColumn("value", concat_ws(";", $"company", $"year", $"month", $"day", $"hour", $"minute",
+      $"second", $"value").cast(StringType).alias("value"))
+      .select($"value")
+
     //+++++Minute
     val eventHitCompanyMinDf_1 = parsedRawDf.select(to_utc_timestamp(
       from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType), $"company").withColumn("value", lit(1)
@@ -389,7 +394,7 @@ object RawDataStream extends Utils {
       .foreach(writerEventHitCompanySec)
       .start()
 
-    val eventHitCompanySecKafkaQuery = eventHitCompanySecDs
+    val eventHitCompanySecKafkaQuery = eventHitCompanySecKafkaDs
       .writeStream
       .format("kafka")
       .outputMode("update")

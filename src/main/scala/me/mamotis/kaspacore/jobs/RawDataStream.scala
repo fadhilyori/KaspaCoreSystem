@@ -137,8 +137,7 @@ object RawDataStream extends Utils {
 
     val eventHitCompanySecKafkaDs = eventHitCompanySecDf_2
       .withColumn("value", concat_ws(";", $"company", $"year", $"month", $"day", $"hour", $"minute",
-      $"second", $"value").cast(StringType).alias("value"))
-      .select($"value")
+      $"second", $"value")).selectExpr("CAST(value AS STRING)")
 
     //+++++Minute
     val eventHitCompanyMinDf_1 = parsedRawDf.select(to_utc_timestamp(

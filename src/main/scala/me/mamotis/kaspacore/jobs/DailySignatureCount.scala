@@ -40,8 +40,6 @@ object DailySignatureCount extends Utils {
       .withColumn("month", lit(LocalDate.now.getMonthValue))
       .withColumn("day", lit(LocalDate.now.getDayOfMonth))
 
-    pushSignatureCompanyDf.show()
-
     // ======================================Company===============================
 
 
@@ -60,8 +58,6 @@ object DailySignatureCount extends Utils {
       .withColumn("month", lit(LocalDate.now.getMonthValue))
       .withColumn("day", lit(LocalDate.now.getDayOfMonth))
 
-    pushSignatureDeviceIdDf.show()
-
 
     // ======================================Device ID===============================
 
@@ -70,14 +66,14 @@ object DailySignatureCount extends Utils {
       .write
       .format("org.apache.spark.sql.cassandra")
       .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "signature_hit_on_company_day"))
-      .mode(SaveMode.Overwrite)
+      .mode(SaveMode.Append)
       .save()
 
     pushSignatureDeviceIdDf
       .write
       .format("org.apache.spark.sql.cassandra")
       .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "signature_hit_on_device_id_day"))
-      .mode(SaveMode.Overwrite)
+      .mode(SaveMode.Append)
       .save()
   }
 }

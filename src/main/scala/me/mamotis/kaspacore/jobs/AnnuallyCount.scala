@@ -6,7 +6,7 @@ import java.time.LocalDate
 import org.apache.spark.sql.SaveMode
 import org.apache.spark.sql.functions.{lit}
 
-object DailyCount extends Utils {
+object AnnuallyCount extends Utils {
 
   def main(args: Array[String]): Unit = {
     val sparkSession = getSparkSession(args)
@@ -17,11 +17,9 @@ object DailyCount extends Utils {
     import sparkSession.implicits._
     sparkContext.setLogLevel("ERROR")
 
-    // Raw Event Dataframe Parsing
     val rawDf = sparkSession.read.json(PropertiesLoader.hadoopEventFilePath)
       .select($"company", $"device_id", $"protocol", $"src_port", $"dest_port", $"src_ip", $"dest_ip", $"src_country",
-        $"dest_country", $"alert_msg", $"year", $"month", $"day")
-      .na.fill(Map("src_country" -> "UNDEFINED", "dest_country" -> "UNDEFINED"))
+        $"dest_country", $"alert_msg", $"year")
       .filter($"year" === LocalDate.now.getYear)
       .filter($"month" === LocalDate.now.getMonthValue)
       .filter($"day" === LocalDate.now.getDayOfMonth)
@@ -40,8 +38,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     // Signature
     val countedSignatureCompanyDf = rawDf
@@ -55,8 +53,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     //Protocol
     val countedProtocolCompanyDf = rawDf
@@ -70,8 +68,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     //ProtocolBySPort
     val countedProtocolBySPortCompanyDf = rawDf
@@ -82,11 +80,11 @@ object DailyCount extends Utils {
     val pushProtocolBySPortCompanyDf = countedProtocolBySPortCompanyDf
       .select(
         $"company", $"protocol", $"src_port",
-      $"count".alias("value").as[Long]
+        $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     //ProtocolByDPort
     val countedProtocolByDPortCompanyDf = rawDf
@@ -100,8 +98,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     //IpSrc
     val countedIpSrcCompanyDf = rawDf
@@ -115,8 +113,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     //IpDest
     val countedIpDestCompanyDf = rawDf
@@ -130,8 +128,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     //CountrySrc
     val countedCountrySrcCompanyDf = rawDf
@@ -145,8 +143,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     //CountryDest
     val countedCountryDestCompanyDf = rawDf
@@ -160,8 +158,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
 
     // ======================================Company===============================
@@ -180,8 +178,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     // Signature
     val countedSignatureDeviceIdDf = rawDf
@@ -195,8 +193,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     // Protocol
     val countedProtocolDeviceIdDf = rawDf
@@ -210,8 +208,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     //ProtocolBySPort
     val countedProtocolBySPortDeviceIdDf = rawDf
@@ -225,8 +223,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     //ProtocolByDPort
     val countedProtocolByDPortDeviceIdDf = rawDf
@@ -240,8 +238,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     //IpSrc
     val countedIpSrcDeviceIdDf = rawDf
@@ -255,8 +253,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     //IpDest
     val countedIpDestDeviceIdDf = rawDf
@@ -270,8 +268,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     //CountrySrc
     val countedCountrySrcDeviceIdDf = rawDf
@@ -285,8 +283,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     //CountryDest
     val countedCountryDestDeviceIdDf = rawDf
@@ -300,8 +298,8 @@ object DailyCount extends Utils {
         $"count".alias("value").as[Long]
       )
       .withColumn("year", lit(LocalDate.now.getYear))
-      .withColumn("month", lit(LocalDate.now.getMonthValue))
-      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
+
 
     // ======================================Device ID===============================
 
@@ -310,7 +308,7 @@ object DailyCount extends Utils {
     pushHitCompanyDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "event_hit_on_company_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "event_hit_on_company_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -318,7 +316,7 @@ object DailyCount extends Utils {
     pushSignatureCompanyDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "signature_hit_on_company_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "signature_hit_on_company_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -326,7 +324,7 @@ object DailyCount extends Utils {
     pushProtocolCompanyDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "protocol_hit_on_company_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "protocol_hit_on_company_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -334,7 +332,7 @@ object DailyCount extends Utils {
     pushProtocolBySPortCompanyDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "protocol_by_sport_hit_on_company_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "protocol_by_sport_hit_on_company_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -342,7 +340,7 @@ object DailyCount extends Utils {
     pushProtocolByDPortCompanyDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "protocol_by_dport_hit_on_company_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "protocol_by_dport_hit_on_company_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -350,7 +348,7 @@ object DailyCount extends Utils {
     pushIpSrcCompanyDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "ip_source_hit_on_company_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "ip_source_hit_on_company_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -358,7 +356,7 @@ object DailyCount extends Utils {
     pushIpDestCompanyDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "ip_dest_hit_on_company_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "ip_dest_hit_on_company_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -366,7 +364,7 @@ object DailyCount extends Utils {
     pushCountrySrcCompanyDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "country_source_hit_on_company_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "country_source_hit_on_company_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -374,7 +372,7 @@ object DailyCount extends Utils {
     pushCountryDestCompanyDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "country_dest_hit_on_company_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "country_dest_hit_on_company_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -383,7 +381,7 @@ object DailyCount extends Utils {
     pushHitDeviceIdDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "event_hit_on_device_id_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "event_hit_on_device_id_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -391,7 +389,7 @@ object DailyCount extends Utils {
     pushSignatureDeviceIdDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "signature_hit_on_device_id_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "signature_hit_on_device_id_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -399,7 +397,7 @@ object DailyCount extends Utils {
     pushProtocolDeviceIdDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "protocol_hit_on_device_id_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "protocol_hit_on_device_id_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -407,7 +405,7 @@ object DailyCount extends Utils {
     pushProtocolBySPortDeviceIdDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "protocol_by_sport_hit_on_device_id_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "protocol_by_sport_hit_on_device_id_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -415,7 +413,7 @@ object DailyCount extends Utils {
     pushProtocolByDPortDeviceIdDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "protocol_by_dport_hit_on_device_id_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "protocol_by_dport_hit_on_device_id_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -423,7 +421,7 @@ object DailyCount extends Utils {
     pushIpSrcDeviceIdDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "ip_source_hit_on_device_id_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "ip_source_hit_on_device_id_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -431,7 +429,7 @@ object DailyCount extends Utils {
     pushIpDestDeviceIdDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "ip_dest_hit_on_device_id_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "ip_dest_hit_on_device_id_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -439,7 +437,7 @@ object DailyCount extends Utils {
     pushCountrySrcDeviceIdDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "country_source_hit_on_device_id_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "country_source_hit_on_device_id_year"))
       .mode(SaveMode.Append)
       .save()
 
@@ -447,8 +445,9 @@ object DailyCount extends Utils {
     pushCountryDestDeviceIdDf
       .write
       .format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "country_dest_hit_on_device_id_day"))
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "country_dest_hit_on_device_id_year"))
       .mode(SaveMode.Append)
       .save()
   }
+
 }

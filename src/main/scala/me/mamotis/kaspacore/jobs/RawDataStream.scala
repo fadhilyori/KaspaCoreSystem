@@ -1,9 +1,12 @@
 package me.mamotis.kaspacore.jobs
 
+import java.sql.Timestamp
+
 import com.databricks.spark.avro.ConfluentSparkAvroUtils
 import me.mamotis.kaspacore.util._
 import org.apache.spark.sql.ForeachWriter
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.StringType
 import org.joda.time.DateTime
 
 object RawDataStream extends Utils {
@@ -71,13 +74,9 @@ object RawDataStream extends Utils {
       val sig_rev = r.getAs[Long](15).toInt
       val company = r.getAs[String](16)
       val src_country = Tools.IpLookupCountry(src_ip)
-//      val src_country = "Dummy Country"
       val src_region = Tools.IpLookupRegion(src_ip)
-//      val src_region = "Dummy City"
       val dest_country = Tools.IpLookupCountry(dest_ip)
-//      val dest_country = "Dummy Country"
       val dest_region = Tools.IpLookupRegion(dest_ip)
-//      val dest_region = "Dummy City"
 
       val date = new DateTime((ts.toDouble * 1000).toLong)
       val year = date.getYear()
@@ -102,12 +101,99 @@ object RawDataStream extends Utils {
       $"sig_id", $"sig_gen", $"sig_rev", $"src_country", $"src_region",
       $"dest_country", $"dest_region").as[Commons.EventObj]
 
+
+    //+++++++++++++Push Event Hit Company per Second++++++++++++++++++++++
+    //+++++Second
+    val eventHitCompanySecDf_1 = parsedRawDf.select(to_utc_timestamp(
+      from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType), $"company").withColumn("value", lit(1)
+    ).groupBy(
+      $"company",
+      window($"timestamp", "1 seconds").alias("windows")
+    ).sum("value")
+
+    val eventHitCompanySecDf_2 = eventHitCompanySecDf_1.select($"company", $"windows.start" , $"sum(value)").map{
+      r =>
+        val company = r.getAs[String](0)
+
+        val epoch = r.getAs[Timestamp](1).getTime
+
+        val date = new DateTime(epoch)
+        val year = date.getYear()
+        val month = date.getMonthOfYear()
+        val day = date.getDayOfMonth()
+        val hour = date.getHourOfDay()
+        val minute = date.getMinuteOfHour()
+        val second = date.getSecondOfMinute()
+
+        val value = r.getAs[Long](2)
+
+        new Commons.EventHitCompanyObjSec(
+          company, year, month, day, hour, minute, second, value
+        )
+    }.toDF(ColsArtifact.colsEventHitCompanyObjSec: _*)
+
+    val eventHitCompanySecDs = eventHitCompanySecDf_2.select($"company", $"year",
+      $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.EventHitCompanyObjSec]
+
+    //+++++++++++++Push Event Hit DeviceId per Second++++++++++++++++++++++
+    //+++++Second
+    val eventHitDeviceIdSecDf_1 = parsedRawDf.select(to_utc_timestamp(
+      from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType), $"device_id").withColumn("value", lit(1)
+    ).groupBy(
+      $"device_id",
+      window($"timestamp", "1 seconds").alias("windows")
+    ).sum("value")
+
+    val eventHitDeviceIdSecDf_2 = eventHitDeviceIdSecDf_1.select($"device_id", $"windows.start" , $"sum(value)").map{
+      r =>
+        val device_id = r.getAs[String](0)
+
+        val epoch = r.getAs[Timestamp](1).getTime
+
+        val date = new DateTime(epoch)
+        val year = date.getYear()
+        val month = date.getMonthOfYear()
+        val day = date.getDayOfMonth()
+        val hour = date.getHourOfDay()
+        val minute = date.getMinuteOfHour()
+        val second = date.getSecondOfMinute()
+
+        val value = r.getAs[Long](2)
+
+        new Commons.EventHitDeviceIdObjSec(
+          device_id, year, month, day, hour, minute, second, value
+        )
+    }.toDF(ColsArtifact.colsEventHitDeviceIdObjSec: _*)
+
+    val eventHitDeviceIdSecDs = eventHitDeviceIdSecDf_2.select($"device_id", $"year",
+      $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.EventHitDeviceIdObjSec]
+
     //======================================================CASSANDRA WRITER======================================
     val writerEvent = new ForeachWriter[Commons.EventObj] {
       override def open(partitionId: Long, version: Long): Boolean = true
 
       override def process(value: Commons.EventObj): Unit = {
         PushArtifact.pushRawData(value, connector)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {}
+    }
+
+    val writerEventHitCompanySec = new ForeachWriter[Commons.EventHitCompanyObjSec] {
+      override def open(partitionId: Long, version: Long): Boolean = true
+
+      override def process(value: Commons.EventHitCompanyObjSec): Unit = {
+        PushArtifact.pushEventHitCompanySec(value, connector)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {}
+    }
+
+    val writerEventHitDeviceIdSec = new ForeachWriter[Commons.EventHitDeviceIdObjSec] {
+      override def open(partitionId: Long, version: Long): Boolean = true
+
+      override def process(value: Commons.EventHitDeviceIdObjSec): Unit = {
+        PushArtifact.pushEventHitDeviceIdSec(value, connector)
       }
 
       override def close(errorOrNull: Throwable): Unit = {}
@@ -134,7 +220,23 @@ object RawDataStream extends Utils {
       .option("checkpointLocation", PropertiesLoader.checkpointLocation)
       .start()
 
+    val eventHitCompanySecQuery = eventHitCompanySecDs
+      .writeStream
+      .outputMode("update")
+      .queryName("EventHitCompanyPerSec")
+      .foreach(writerEventHitCompanySec)
+      .start()
+
+    val eventHitDeviceIdSecQuery = eventHitDeviceIdSecDs
+      .writeStream
+      .outputMode("update")
+      .queryName("EventHitDeviceIdPerSec")
+      .foreach(writerEventHitDeviceIdSec)
+      .start()
+
     eventPushQuery.awaitTermination()
     eventPushHDFS.awaitTermination()
+    eventHitCompanySecQuery.awaitTermination()
+    eventHitDeviceIdSecQuery.awaitTermination()
   }
 }

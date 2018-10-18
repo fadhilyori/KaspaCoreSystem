@@ -19,7 +19,7 @@ object Commons {
                         sig_rev: Integer, src_country: String, src_region: String,
                         dest_country: String, dest_region: String) extends Serializable
 
-  case class EventHitCompanyObjSecond(company: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class EventHitCompanyObjSec(company: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                    minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class EventHitCompanyObjMin(company: String, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -30,7 +30,7 @@ object Commons {
 
   case class EventHitCompanyObjDay(company: String, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
-  case class EventHitDeviceIdObjSecond(device_id: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class EventHitDeviceIdObjSec(device_id: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                     minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class EventHitDeviceIdObjMin(device_id: String, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -43,7 +43,7 @@ object Commons {
 
   //  Signature Related Obj
 
-  case class SignatureHitCompanyObjSecond(company: String, alert_msg: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class SignatureHitCompanyObjSec(company: String, alert_msg: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                        minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class SignatureHitCompanyObjMin(company: String, alert_msg: String, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -54,7 +54,7 @@ object Commons {
 
   case class SignatureHitCompanyObjDay(company: String, alert_msg: String, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
-  case class SignatureHitDeviceIdObjSecond(device_id: String, alert_msg: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class SignatureHitDeviceIdObjSec(device_id: String, alert_msg: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                         minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class SignatureHitDeviceIdObjMin(device_id: String, alert_msg: String, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -67,7 +67,7 @@ object Commons {
 
   //  Protocol Related Obj
 
-  case class ProtocolHitCompanyObjSecond(company: String, protocol: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class ProtocolHitCompanyObjSec(company: String, protocol: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                       minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class ProtocolHitCompanyObjMin(company: String, protocol: String, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -78,7 +78,7 @@ object Commons {
 
   case class ProtocolHitCompanyObjDay(company: String, protocol: String, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
-  case class ProtocolHitDeviceIdObjSecond(device_id: String, protocol: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class ProtocolHitDeviceIdObjSec(device_id: String, protocol: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                        minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class ProtocolHitDeviceIdObjMin(device_id: String, protocol: String, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -91,7 +91,7 @@ object Commons {
 
   //  Protocol + Port Related Obj
 
-  case class ProtocolBySPortHitCompanyObjSecond(company: String, protocol: String, src_port: Integer, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class ProtocolBySPortHitCompanyObjSec(company: String, protocol: String, src_port: Integer, year: Integer, month: Integer, day: Integer, hour: Integer,
                                              minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class ProtocolBySPortHitCompanyObjMin(company: String, protocol: String, src_port: Integer, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -102,7 +102,7 @@ object Commons {
 
   case class ProtocolBySPortHitCompanyObjDay(company: String, protocol: String, src_port: Integer, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
-  case class ProtocolBySPortHitDeviceIdObjSecond(device_id: String, protocol: String, src_port: Integer, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class ProtocolBySPortHitDeviceIdObjSec(device_id: String, protocol: String, src_port: Integer, year: Integer, month: Integer, day: Integer, hour: Integer,
                                               minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class ProtocolBySPortHitDeviceIdObjMin(device_id: String, protocol: String, src_port: Integer, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -113,7 +113,7 @@ object Commons {
 
   case class ProtocolBySPortHitDeviceIdObjDay(device_id: String, protocol: String, src_port: Integer, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
-  case class ProtocolByDPortHitCompanyObjSecond(company: String, protocol: String, dest_port: Integer, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class ProtocolByDPortHitCompanyObjSec(company: String, protocol: String, dest_port: Integer, year: Integer, month: Integer, day: Integer, hour: Integer,
                                              minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class ProtocolByDPortHitCompanyObjMin(company: String, protocol: String, dest_port: Integer, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -124,7 +124,7 @@ object Commons {
 
   case class ProtocolByDPortHitCompanyObjDay(company: String, protocol: String, dest_port: Integer, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
-  case class ProtocolByDPortHitDeviceIdObjSecond(device_id: String, protocol: String, dest_port: Integer, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class ProtocolByDPortHitDeviceIdObjSec(device_id: String, protocol: String, dest_port: Integer, year: Integer, month: Integer, day: Integer, hour: Integer,
                                               minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class ProtocolByDPortHitDeviceIdObjMin(device_id: String, protocol: String, dest_port: Integer, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -137,7 +137,7 @@ object Commons {
 
   //  IP + Country Related Obj
 
-  case class IPSourceHitCompanyObjSecond(company: String, src_ip: String, country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class IPSourceHitCompanyObjSec(company: String, src_ip: String, country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                       minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class IPSourceHitCompanyObjMin(company: String, src_ip: String, country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -148,7 +148,7 @@ object Commons {
 
   case class IPSourceHitCompanyObjDay(company: String, src_ip: String, country: String, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
-  case class IPSourceHitDeviceIdObjSecond(device_id: String, src_ip: String, country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class IPSourceHitDeviceIdObjSec(device_id: String, src_ip: String, country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                        minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class IPSourceHitDeviceIdObjMin(device_id: String, src_ip: String, country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -159,7 +159,7 @@ object Commons {
 
   case class IPSourceHitDeviceIdObjDay(device_id: String, src_ip: String, country: String, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
-  case class IPDestHitCompanyObjSecond(company: String, dest_ip: String, country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class IPDestHitCompanyObjSec(company: String, dest_ip: String, country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                     minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class IPDestHitCompanyObjMin(company: String, dest_ip: String, country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -170,7 +170,7 @@ object Commons {
 
   case class IPDestHitCompanyObjDay(company: String, dest_ip: String, country: String, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
-  case class IPDestHitDeviceIdObjSecond(device_id: String, dest_ip: String, country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class IPDestHitDeviceIdObjSec(device_id: String, dest_ip: String, country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                      minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class IPDestHitDeviceIdObjMin(device_id: String, dest_ip: String, country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -181,7 +181,7 @@ object Commons {
 
   case class IPDestHitDeviceIdObjDay(device_id: String, dest_ip: String, country: String, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
-  case class CountrySrcHitCompanyObjSecond(company: String, src_country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class CountrySrcHitCompanyObjSec(company: String, src_country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                         minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class CountrySrcHitCompanyObjMin(company: String, src_country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -192,7 +192,7 @@ object Commons {
 
   case class CountrySrcHitCompanyObjDay(company: String, src_country: String, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
-  case class CountrySrcHitDeviceIdObjSecond(device_id: String, src_country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class CountrySrcHitDeviceIdObjSec(device_id: String, src_country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                          minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class CountrySrcHitDeviceIdObjMin(device_id: String, src_country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -203,7 +203,7 @@ object Commons {
 
   case class CountrySrcHitDeviceIdObjDay(device_id: String, src_country: String, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
-  case class CountryDestHitCompanyObjSecond(company: String, dest_country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class CountryDestHitCompanyObjSec(company: String, dest_country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                          minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class CountryDestHitCompanyObjMin(company: String, dest_country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
@@ -214,7 +214,7 @@ object Commons {
 
   case class CountryDestHitCompanyObjDay(company: String, dest_country: String, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
-  case class CountryDestHitDeviceIdObjSecond(device_id: String, dest_country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
+  case class CountryDestHitDeviceIdObjSec(device_id: String, dest_country: String, year: Integer, month: Integer, day: Integer, hour: Integer,
                                           minute: Integer, second: Integer, value: Long) extends Serializable
 
   case class CountryDestHitDeviceIdObjMin(device_id: String, dest_country: String, year: Integer, month: Integer, day: Integer, hour: Integer,

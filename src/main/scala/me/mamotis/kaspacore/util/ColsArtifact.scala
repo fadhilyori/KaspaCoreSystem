@@ -12,7 +12,7 @@ object ColsArtifact {
     "src_port", "dest_port", "alert_msg", "classification", "priority",
     "sig_id", "sig_gen", "sig_rev", "src_country", "src_region", "dest_country", "dest_region")
 
-  val colsEventHitCompanyObjSecond = List("company", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsEventHitCompanyObjSec = List("company", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsEventHitCompanyObjMin = List("company", "year", "month", "day", "hour", "minute", "value")
 
@@ -20,7 +20,7 @@ object ColsArtifact {
 
   val colsEventHitCompanyObjDay = List("company", "year", "month", "day", "value")
 
-  val colsEventHitDeviceIdObjSecond = List("device_id", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsEventHitDeviceIdObjSec = List("device_id", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsEventHitDeviceIdObjMin = List("device_id", "year", "month", "day", "hour", "minute", "value")
 
@@ -30,7 +30,7 @@ object ColsArtifact {
 
   //  Signature Hit
 
-  val colsSignatureHitCompanyObjSecond = List("company", "alert_msg", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsSignatureHitCompanyObjSec = List("company", "alert_msg", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsSignatureHitCompanyObjMin = List("company", "alert_msg", "year", "month", "day", "hour", "minute", "value")
 
@@ -38,7 +38,7 @@ object ColsArtifact {
 
   val colsSignatureHitCompanyObjDay = List("company", "alert_msg", "year", "month", "day", "value")
 
-  val colsSignatureHitDeviceIdObjSecond = List("device_id", "alert_msg", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsSignatureHitDeviceIdObjSec = List("device_id", "alert_msg", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsSignatureHitDeviceIdObjMin = List("device_id", "alert_msg", "year", "month", "day", "hour", "minute", "value")
 
@@ -48,7 +48,7 @@ object ColsArtifact {
 
   //  Protocol Hit
 
-  val colsProtocolHitCompanyObjSecond = List("company", "protocol", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsProtocolHitCompanyObjSec = List("company", "protocol", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsProtocolHitCompanyObjMin = List("company", "protocol", "year", "month", "day", "hour", "minute", "value")
 
@@ -56,7 +56,7 @@ object ColsArtifact {
 
   val colsProtocolHitCompanyObjDay = List("company", "protocol", "year", "month", "day", "value")
 
-  val colsProtocolHitDeviceIdObjSecond = List("device_id", "protocol", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsProtocolHitDeviceIdObjSec = List("device_id", "protocol", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsProtocolHitDeviceIdObjMin = List("device_id", "protocol", "year", "month", "day", "hour", "minute", "value")
 
@@ -66,7 +66,7 @@ object ColsArtifact {
 
   //  Protocol + Port Hit
 
-  val colsProtocolBySPortHitCompanyObjSecond = List("company", "protocol", "src_port", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsProtocolBySPortHitCompanyObjSec = List("company", "protocol", "src_port", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsProtocolBySPortHitCompanyObjMin = List("company", "protocol", "src_port", "year", "month", "day", "hour", "minute", "value")
 
@@ -74,7 +74,7 @@ object ColsArtifact {
 
   val colsProtocolBySPortHitCompanyObjDay = List("company", "protocol", "src_port", "year", "month", "day", "value")
 
-  val colsProtocolBySPortHitDeviceIdObjSecond = List("device_id", "protocol", "src_port", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsProtocolBySPortHitDeviceIdObjSec = List("device_id", "protocol", "src_port", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsProtocolBySPortHitDeviceIdObjMin = List("device_id", "protocol", "src_port", "year", "month", "day", "hour", "minute", "value")
 
@@ -82,7 +82,7 @@ object ColsArtifact {
 
   val colsProtocolBySPortHitDeviceIdObjDay = List("device_id", "protocol", "src_port", "year", "month", "day", "value")
 
-  val colsProtocolByDPortHitCompanyObjSecond = List("company", "protocol", "dest_port", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsProtocolByDPortHitCompanyObjSec = List("company", "protocol", "dest_port", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsProtocolByDPortHitCompanyObjMin = List("company", "protocol", "dest_port", "year", "month", "day", "hour", "minute", "value")
 
@@ -90,7 +90,7 @@ object ColsArtifact {
 
   val colsProtocolByDPortHitCompanyObjDay = List("company", "protocol", "dest_port", "year", "month", "day", "value")
 
-  val colsProtocolByDPortHitDeviceIdObjSecond = List("device_id", "protocol", "dest_port", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsProtocolByDPortHitDeviceIdObjSec = List("device_id", "protocol", "dest_port", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsProtocolByDPortHitDeviceIdObjMin = List("device_id", "protocol", "dest_port", "year", "month", "day", "hour", "minute", "value")
 
@@ -100,7 +100,7 @@ object ColsArtifact {
 
   //  IP Source, Ip Dest, Country
 
-  val colsIPSourceHitCompanyObjSecond = List("company", "src_ip", "country", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsIPSourceHitCompanyObjSec = List("company", "src_ip", "country", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsIPSourceHitCompanyObjMin = List("company", "src_ip", "country", "year", "month", "day", "hour", "minute", "value")
 
@@ -108,7 +108,7 @@ object ColsArtifact {
 
   val colsIPSourceHitCompanyObjDay = List("company", "src_ip", "country", "year", "month", "day", "value")
 
-  val colsIPSourceHitDeviceIdObjSecond = List("device_id", "src_ip", "country", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsIPSourceHitDeviceIdObjSec = List("device_id", "src_ip", "country", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsIPSourceHitDeviceIdObjMin = List("device_id", "src_ip", "country", "year", "month", "day", "hour", "minute", "value")
 
@@ -116,7 +116,7 @@ object ColsArtifact {
 
   val colsIPSourceHitDeviceIdObjDay = List("device_id", "src_ip", "country", "year", "month", "day", "value")
 
-  val colsIPDestHitCompanyObjSecond = List("company", "dest_ip", "country", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsIPDestHitCompanyObjSec = List("company", "dest_ip", "country", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsIPDestHitCompanyObjMin = List("company", "dest_ip", "country", "year", "month", "day", "hour", "minute", "value")
 
@@ -124,7 +124,7 @@ object ColsArtifact {
 
   val colsIPDestHitCompanyObjDay = List("company", "dest_ip", "country", "year", "month", "day", "value")
 
-  val colsIPDestHitDeviceIdObjSecond = List("device_id", "dest_ip", "country", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsIPDestHitDeviceIdObjSec = List("device_id", "dest_ip", "country", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsIPDestHitDeviceIdObjMin = List("device_id", "dest_ip", "country", "year", "month", "day", "hour", "minute", "value")
 
@@ -132,7 +132,7 @@ object ColsArtifact {
 
   val colsIPDestHitDeviceIdObjDay = List("device_id", "dest_ip", "country", "year", "month", "day", "value")
 
-  val colsCountrySrcHitCompanyObjSecond = List("company", "src_country", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsCountrySrcHitCompanyObjSec = List("company", "src_country", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsCountrySrcHitCompanyObjMin = List("company", "src_country", "year", "month", "day", "hour", "minute", "value")
 
@@ -140,7 +140,7 @@ object ColsArtifact {
 
   val colsCountrySrcHitCompanyObjDay = List("company", "src_country", "year", "month", "day", "value")
 
-  val colsCountrySrcHitDeviceIdObjSecond = List("device_id", "src_country", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsCountrySrcHitDeviceIdObjSec = List("device_id", "src_country", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsCountrySrcHitDeviceIdObjMin = List("device_id", "src_country", "year", "month", "day", "hour", "minute", "value")
 
@@ -148,7 +148,7 @@ object ColsArtifact {
 
   val colsCountrySrcHitDeviceIdObjDay = List("device_id", "src_country", "year", "month", "day", "value")
 
-  val colsCountryDestHitCompanyObjSecond = List("company", "dest_country", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsCountryDestHitCompanyObjSec = List("company", "dest_country", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsCountryDestHitCompanyObjMin = List("company", "dest_country", "year", "month", "day", "hour", "minute", "value")
 
@@ -156,7 +156,7 @@ object ColsArtifact {
 
   val colsCountryDestHitCompanyObjDay = List("company", "dest_country", "year", "month", "day", "value")
 
-  val colsCountryDestHitDeviceIdObjSecond = List("device_id", "dest_country", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsCountryDestHitDeviceIdObjSec = List("device_id", "dest_country", "year", "month", "day", "hour", "minute", "second", "value")
 
   val colsCountryDestHitDeviceIdObjMin = List("device_id", "dest_country", "year", "month", "day", "hour", "minute", "value")
 

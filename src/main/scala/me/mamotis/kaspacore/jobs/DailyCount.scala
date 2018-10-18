@@ -26,6 +26,21 @@ object DailyCount extends Utils {
       .cache()
 
     // ======================================Company==============================
+    // Hit Count
+    val countedHitCompanyDf = rawDf
+      .groupBy($"company")
+      .count()
+      .sort($"company".desc, $"count".desc)
+
+    val pushHitCompanyDf = countedHitCompanyDf
+      .select(
+        $"company",
+        $"count".alias("value").as[Long]
+      )
+      .withColumn("year", lit(LocalDate.now.getYear))
+      .withColumn("month", lit(LocalDate.now.getMonthValue))
+      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
     // Signature
     val countedSignatureCompanyDf = rawDf
       .groupBy($"company", $"alert_msg")
@@ -151,6 +166,21 @@ object DailyCount extends Utils {
 
 
     // ======================================Device ID===============================
+    // Hit Count
+    val countedHitDeviceIdDf = rawDf
+      .groupBy($"device_id")
+      .count()
+      .sort($"device_id".desc, $"count".desc)
+
+    val pushHitDeviceIdDf = countedHitDeviceIdDf
+      .select(
+        $"device_id",
+        $"count".alias("value").as[Long]
+      )
+      .withColumn("year", lit(LocalDate.now.getYear))
+      .withColumn("month", lit(LocalDate.now.getMonthValue))
+      .withColumn("day", lit(LocalDate.now.getDayOfMonth))
+
     // Signature
     val countedSignatureDeviceIdDf = rawDf
       .groupBy($"device_id", $"alert_msg")
@@ -274,6 +304,14 @@ object DailyCount extends Utils {
     // ======================================Device ID===============================
 
     // ======================================Query Company===============================
+    // Event Hit
+    pushHitCompanyDf
+      .write
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "event_hit_on_company_day"))
+      .mode(SaveMode.Append)
+      .save()
+
     // Signature
     pushSignatureCompanyDf
       .write
@@ -339,6 +377,14 @@ object DailyCount extends Utils {
       .save()
 
     // ======================================Query Device ID===============================
+    // Event Hit
+    pushHitDeviceIdDf
+      .write
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map("keyspace" -> PropertiesLoader.cassandraKeyspace, "table" -> "event_hit_on_device_id_day"))
+      .mode(SaveMode.Append)
+      .save()
+
     // Signature
     pushSignatureDeviceIdDf
       .write

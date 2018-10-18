@@ -19,7 +19,8 @@ object DailyCount extends Utils {
 
     // Raw Event Dataframe Parsing
     val rawDf = sparkSession.read.json(PropertiesLoader.hadoopEventFilePath)
-      .select($"company", $"device_id", $"alert_msg", $"year", $"month", $"day")
+      .select($"company", $"device_id", $"protocol", $"src_port", $"dest_port", $"src_ip", $"dest_ip", $"src_country",
+        $"dest_country", $"alert_msg", $"year", $"month", $"day")
       .filter($"year" === LocalDate.now.getYear)
       .filter($"month" === LocalDate.now.getMonthValue)
       .filter($"day" === LocalDate.now.getDayOfMonth)

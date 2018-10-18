@@ -394,6 +394,7 @@ object RawDataStream extends Utils {
       .format("kafka")
       .option("kafka.bootstrap.servers", PropertiesLoader.kafkaBrokerUrlOutput)
       .option("topic", PropertiesLoader.kafkaOutputTopic)
+      .option("checkpointLocation", PropertiesLoader.kafkaCheckpointLocation)
       .start()
 
     val eventHitCompanyMinQuery = eventHitCompanyMinDs

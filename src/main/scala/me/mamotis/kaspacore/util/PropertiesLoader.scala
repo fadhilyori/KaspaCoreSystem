@@ -24,6 +24,7 @@ object PropertiesLoader {
   val hadoopEventFilePath: String = conf.getString("HADOOP_EVENT_FILE_PATH")
   val hadoopSchemaFilePath: String = conf.getString("HADOOP_SCHEMA_FILE_PATH")
   val checkpointLocation: String = conf.getString("CHECKPOINT_LOCATION")
+  val kafkaCheckpointLocation: String = conf.getString("KAFKA_CHECKPOINT_LOCATION")
 
   val cassandraUsername: String = conf.getString("CASSANDRA_USERNAME")
   val cassandraPassword: String = conf.getString("CASSANDRA_PASSWORD")

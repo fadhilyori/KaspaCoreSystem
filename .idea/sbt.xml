@@ -4,7 +4,15 @@
     <option name="customVMPath" />
     <option name="linkedExternalProjectsSettings">
       <SbtProjectSettings>
-        <option name="externalProjectPath" value="D:\Programming Platform\Scala\Belajar\KaspaCore" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/project" />
+          </set>
+        </option>
+        <option name="sbtVersion" value="1.2.3" />
+        <option name="useSbtShell" value="true" />
       </SbtProjectSettings>
     </option>
   </component>

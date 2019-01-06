@@ -64,6 +64,8 @@ libraryDependencies += "org.typelevel" %% "cats-effect-laws" % "1.0.0" % "test"
 
 libraryDependencies += "com.typesafe" % "config" % "1.3.2"
 
+libraryDependencies += "org.mongodb.spark" % "mongo-spark-connector_2.11" % "2.3.1"
+
 assemblyMergeStrategy in assembly := {
   {
     case "META-INF/services/org.apache.spark.sql.sources.DataSourceRegister" => MergeStrategy.concat

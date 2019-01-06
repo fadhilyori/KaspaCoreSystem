@@ -444,6 +444,7 @@ object RawDataStream extends Utils {
                 doc.put("src_region", sc.src_region)
                 doc.put("dest_country", sc.dest_country)
                 doc.put("dest_region", sc.dest_region)
+                doc
               }).asJava)
             })
           }

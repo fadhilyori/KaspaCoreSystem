@@ -16,7 +16,7 @@ import org.joda.time.DateTime
 import scala.collection.mutable
 import scala.collection.JavaConverters._
 
-object RawDataStream extends Utils {
+object RawDataStreamMisbah extends Utils {
 
   def main(args: Array[String]): Unit = {
     //=================================AVRO DESERIALIZER====================================
@@ -393,64 +393,64 @@ object RawDataStream extends Utils {
       .option("checkpointLocation", PropertiesLoader.checkpointLocation)
       .start()
 
-    val eventPushMongo = eventDs
-      .writeStream
-      .outputMode("append")
-      .foreach(new ForeachWriter[Commons.EventObj] {
-
-        val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://10.252.108.98/stevia.event"))
-        var mongoConnector: MongoConnector = _
-        var events: mutable.ArrayBuffer[Commons.EventObj] = _
-
-        override def open(partitionId: Long, version: Long): Boolean = {
-          mongoConnector = MongoConnector(writeConfig.asOptions)
-          events = new mutable.ArrayBuffer[Commons.EventObj]()
-          true
-        }
-
-        override def process(value: Commons.EventObj): Unit = {
-          events.append(value)
-        }
-
-        override def close(errorOrNull: Throwable): Unit = {
-          if (events.nonEmpty) {
-            mongoConnector.withCollectionDo(writeConfig, { collection: MongoCollection[Document] =>
-              collection.insertMany(events.map(sc => {
-                val doc = new Document()
-                doc.put("ts", sc.ts)
-                doc.put("company", sc.company)
-                doc.put("device_id", sc.device_id)
-                doc.put("year", sc.year)
-                doc.put("month", sc.month)
-                doc.put("day", sc.day)
-                doc.put("hour", sc.hour)
-                doc.put("minute", sc.minute)
-                doc.put("second", sc.second)
-                doc.put("protocol", sc.protocol)
-                doc.put("ip_type", sc.ip_type)
-                doc.put("src_mac", sc.src_port)
-                doc.put("dest_mac", sc.dest_mac)
-                doc.put("src_ip", sc.src_ip)
-                doc.put("dest_ip", sc.dest_ip)
-                doc.put("src_port", sc.src_port)
-                doc.put("dest_port", sc.dest_port)
-                doc.put("alert_message", sc.alert_msg)
-                doc.put("classification", sc.classification)
-                doc.put("priority", sc.sig_id)
-                doc.put("sig_id", sc.sig_id)
-                doc.put("sig_gen", sc.sig_gen)
-                doc.put("sig_rev", sc.sig_rev)
-                doc.put("src_country", sc.src_country)
-                doc.put("src_region", sc.src_region)
-                doc.put("dest_country", sc.dest_country)
-                doc.put("dest_region", sc.dest_region)
-                doc
-              }).asJava)
-            })
-          }
-        }
-      })
-      .start()
+//    val eventPushMongo = eventDs
+//      .writeStream
+//      .outputMode("append")
+//      .foreach(new ForeachWriter[Commons.EventObj] {
+//
+//        val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://10.252.108.98/stevia.event"))
+//        var mongoConnector: MongoConnector = _
+//        var events: mutable.ArrayBuffer[Commons.EventObj] = _
+//
+//        override def open(partitionId: Long, version: Long): Boolean = {
+//          mongoConnector = MongoConnector(writeConfig.asOptions)
+//          events = new mutable.ArrayBuffer[Commons.EventObj]()
+//          true
+//        }
+//
+//        override def process(value: Commons.EventObj): Unit = {
+//          events.append(value)
+//        }
+//
+//        override def close(errorOrNull: Throwable): Unit = {
+//          if (events.nonEmpty) {
+//            mongoConnector.withCollectionDo(writeConfig, { collection: MongoCollection[Document] =>
+//              collection.insertMany(events.map(sc => {
+//                val doc = new Document()
+//                doc.put("ts", sc.ts)
+//                doc.put("company", sc.company)
+//                doc.put("device_id", sc.device_id)
+//                doc.put("year", sc.year)
+//                doc.put("month", sc.month)
+//                doc.put("day", sc.day)
+//                doc.put("hour", sc.hour)
+//                doc.put("minute", sc.minute)
+//                doc.put("second", sc.second)
+//                doc.put("protocol", sc.protocol)
+//                doc.put("ip_type", sc.ip_type)
+//                doc.put("src_mac", sc.src_port)
+//                doc.put("dest_mac", sc.dest_mac)
+//                doc.put("src_ip", sc.src_ip)
+//                doc.put("dest_ip", sc.dest_ip)
+//                doc.put("src_port", sc.src_port)
+//                doc.put("dest_port", sc.dest_port)
+//                doc.put("alert_message", sc.alert_msg)
+//                doc.put("classification", sc.classification)
+//                doc.put("priority", sc.sig_id)
+//                doc.put("sig_id", sc.sig_id)
+//                doc.put("sig_gen", sc.sig_gen)
+//                doc.put("sig_rev", sc.sig_rev)
+//                doc.put("src_country", sc.src_country)
+//                doc.put("src_region", sc.src_region)
+//                doc.put("dest_country", sc.dest_country)
+//                doc.put("dest_region", sc.dest_region)
+//                doc
+//              }).asJava)
+//            })
+//          }
+//        }
+//      })
+//      .start()
 
     val eventHitCompanySecQuery = eventHitCompanySecDs
       .writeStream
@@ -505,7 +505,7 @@ object RawDataStream extends Utils {
 
     eventPushQuery.awaitTermination()
     eventPushHDFS.awaitTermination()
-    eventPushMongo.awaitTermination()
+//    eventPushMongo.awaitTermination()
 //    eventHitCompanySecKafkaQuery.awaitTermination()
     eventHitCompanySecQuery.awaitTermination()
     eventHitCompanyMinQuery.awaitTermination()

@@ -16,7 +16,7 @@ import org.joda.time.DateTime
 import scala.collection.mutable
 import scala.collection.JavaConverters._
 
-object RawDataStreamMisbah extends Utils {
+object RawDataStreamMongo extends Utils {
 
   def main(args: Array[String]): Unit = {
     //=================================AVRO DESERIALIZER====================================
@@ -34,7 +34,7 @@ object RawDataStreamMisbah extends Utils {
 
 
     // Cassandra Connector
-    val connector = getCassandraSession(sparkContext)
+    //val connector = getCassandraSession(sparkContext)
 
     // set implicit and log level
     import sparkSession.implicits._
@@ -302,75 +302,75 @@ object RawDataStreamMisbah extends Utils {
       $"month", $"day", $"hour", $"value").as[Commons.EventHitDeviceIdObjHour]
 
     //======================================================CASSANDRA WRITER======================================
-    val writerEvent = new ForeachWriter[Commons.EventObj] {
-      override def open(partitionId: Long, version: Long): Boolean = true
-
-      override def process(value: Commons.EventObj): Unit = {
-        PushArtifact.pushRawData(value, connector)
-      }
-
-      override def close(errorOrNull: Throwable): Unit = {}
-    }
-
-    val writerEventHitCompanySec = new ForeachWriter[Commons.EventHitCompanyObjSec] {
-      override def open(partitionId: Long, version: Long): Boolean = true
-
-      override def process(value: Commons.EventHitCompanyObjSec): Unit = {
-        PushArtifact.pushEventHitCompanySec(value, connector)
-      }
-
-      override def close(errorOrNull: Throwable): Unit = {}
-    }
-
-    val writerEventHitCompanyMin = new ForeachWriter[Commons.EventHitCompanyObjMin] {
-      override def open(partitionId: Long, version: Long): Boolean = true
-
-      override def process(value: Commons.EventHitCompanyObjMin): Unit = {
-        PushArtifact.pushEventHitCompanyMin(value, connector)
-      }
-
-      override def close(errorOrNull: Throwable): Unit = {}
-    }
-
-    val writerEventHitCompanyHour = new ForeachWriter[Commons.EventHitCompanyObjHour] {
-      override def open(partitionId: Long, version: Long): Boolean = true
-
-      override def process(value: Commons.EventHitCompanyObjHour): Unit = {
-        PushArtifact.pushEventHitCompanyHour(value, connector)
-      }
-
-      override def close(errorOrNull: Throwable): Unit = {}
-    }
-
-    val writerEventHitDeviceIdSec = new ForeachWriter[Commons.EventHitDeviceIdObjSec] {
-      override def open(partitionId: Long, version: Long): Boolean = true
-
-      override def process(value: Commons.EventHitDeviceIdObjSec): Unit = {
-        PushArtifact.pushEventHitDeviceIdSec(value, connector)
-      }
-
-      override def close(errorOrNull: Throwable): Unit = {}
-    }
-
-    val writerEventHitDeviceIdMin = new ForeachWriter[Commons.EventHitDeviceIdObjMin] {
-      override def open(partitionId: Long, version: Long): Boolean = true
-
-      override def process(value: Commons.EventHitDeviceIdObjMin): Unit = {
-        PushArtifact.pushEventHitDeviceIdMin(value, connector)
-      }
-
-      override def close(errorOrNull: Throwable): Unit = {}
-    }
-
-    val writerEventHitDeviceIdHour = new ForeachWriter[Commons.EventHitDeviceIdObjHour] {
-      override def open(partitionId: Long, version: Long): Boolean = true
-
-      override def process(value: Commons.EventHitDeviceIdObjHour): Unit = {
-        PushArtifact.pushEventHitDeviceIdHour(value, connector)
-      }
-
-      override def close(errorOrNull: Throwable): Unit = {}
-    }
+//    val writerEvent = new ForeachWriter[Commons.EventObj] {
+//      override def open(partitionId: Long, version: Long): Boolean = true
+//
+//      override def process(value: Commons.EventObj): Unit = {
+//        PushArtifact.pushRawData(value, connector)
+//      }
+//
+//      override def close(errorOrNull: Throwable): Unit = {}
+//    }
+//
+//    val writerEventHitCompanySec = new ForeachWriter[Commons.EventHitCompanyObjSec] {
+//      override def open(partitionId: Long, version: Long): Boolean = true
+//
+//      override def process(value: Commons.EventHitCompanyObjSec): Unit = {
+//        PushArtifact.pushEventHitCompanySec(value, connector)
+//      }
+//
+//      override def close(errorOrNull: Throwable): Unit = {}
+//    }
+//
+//    val writerEventHitCompanyMin = new ForeachWriter[Commons.EventHitCompanyObjMin] {
+//      override def open(partitionId: Long, version: Long): Boolean = true
+//
+//      override def process(value: Commons.EventHitCompanyObjMin): Unit = {
+//        PushArtifact.pushEventHitCompanyMin(value, connector)
+//      }
+//
+//      override def close(errorOrNull: Throwable): Unit = {}
+//    }
+//
+//    val writerEventHitCompanyHour = new ForeachWriter[Commons.EventHitCompanyObjHour] {
+//      override def open(partitionId: Long, version: Long): Boolean = true
+//
+//      override def process(value: Commons.EventHitCompanyObjHour): Unit = {
+//        PushArtifact.pushEventHitCompanyHour(value, connector)
+//      }
+//
+//      override def close(errorOrNull: Throwable): Unit = {}
+//    }
+//
+//    val writerEventHitDeviceIdSec = new ForeachWriter[Commons.EventHitDeviceIdObjSec] {
+//      override def open(partitionId: Long, version: Long): Boolean = true
+//
+//      override def process(value: Commons.EventHitDeviceIdObjSec): Unit = {
+//        PushArtifact.pushEventHitDeviceIdSec(value, connector)
+//      }
+//
+//      override def close(errorOrNull: Throwable): Unit = {}
+//    }
+//
+//    val writerEventHitDeviceIdMin = new ForeachWriter[Commons.EventHitDeviceIdObjMin] {
+//      override def open(partitionId: Long, version: Long): Boolean = true
+//
+//      override def process(value: Commons.EventHitDeviceIdObjMin): Unit = {
+//        PushArtifact.pushEventHitDeviceIdMin(value, connector)
+//      }
+//
+//      override def close(errorOrNull: Throwable): Unit = {}
+//    }
+//
+//    val writerEventHitDeviceIdHour = new ForeachWriter[Commons.EventHitDeviceIdObjHour] {
+//      override def open(partitionId: Long, version: Long): Boolean = true
+//
+//      override def process(value: Commons.EventHitDeviceIdObjHour): Unit = {
+//        PushArtifact.pushEventHitDeviceIdHour(value, connector)
+//      }
+//
+//      override def close(errorOrNull: Throwable): Unit = {}
+//    }
 
     //====================================================WRITE QUERY=================================
 //    val eventConsoleQuery = eventDs
@@ -379,85 +379,85 @@ object RawDataStreamMisbah extends Utils {
 //      .format("console")
 //      .start().awaitTermination()
 
-    val eventPushQuery = eventDs
-      .writeStream
-      .outputMode("append")
-      .queryName("Event Push Cassandra")
-      .foreach(writerEvent)
-      .start()
-
-    val eventPushHDFS = eventDs
-      .writeStream
-      .format("json")
-      .option("path", PropertiesLoader.hadoopEventFilePath)
-      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
-      .start()
-
-//    val eventPushMongo = eventDs
+//    val eventPushQuery = eventDs
 //      .writeStream
 //      .outputMode("append")
-//      .foreach(new ForeachWriter[Commons.EventObj] {
-//
-//        val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://10.252.108.98/stevia.event"))
-//        var mongoConnector: MongoConnector = _
-//        var events: mutable.ArrayBuffer[Commons.EventObj] = _
-//
-//        override def open(partitionId: Long, version: Long): Boolean = {
-//          mongoConnector = MongoConnector(writeConfig.asOptions)
-//          events = new mutable.ArrayBuffer[Commons.EventObj]()
-//          true
-//        }
-//
-//        override def process(value: Commons.EventObj): Unit = {
-//          events.append(value)
-//        }
-//
-//        override def close(errorOrNull: Throwable): Unit = {
-//          if (events.nonEmpty) {
-//            mongoConnector.withCollectionDo(writeConfig, { collection: MongoCollection[Document] =>
-//              collection.insertMany(events.map(sc => {
-//                val doc = new Document()
-//                doc.put("ts", sc.ts)
-//                doc.put("company", sc.company)
-//                doc.put("device_id", sc.device_id)
-//                doc.put("year", sc.year)
-//                doc.put("month", sc.month)
-//                doc.put("day", sc.day)
-//                doc.put("hour", sc.hour)
-//                doc.put("minute", sc.minute)
-//                doc.put("second", sc.second)
-//                doc.put("protocol", sc.protocol)
-//                doc.put("ip_type", sc.ip_type)
-//                doc.put("src_mac", sc.src_port)
-//                doc.put("dest_mac", sc.dest_mac)
-//                doc.put("src_ip", sc.src_ip)
-//                doc.put("dest_ip", sc.dest_ip)
-//                doc.put("src_port", sc.src_port)
-//                doc.put("dest_port", sc.dest_port)
-//                doc.put("alert_message", sc.alert_msg)
-//                doc.put("classification", sc.classification)
-//                doc.put("priority", sc.sig_id)
-//                doc.put("sig_id", sc.sig_id)
-//                doc.put("sig_gen", sc.sig_gen)
-//                doc.put("sig_rev", sc.sig_rev)
-//                doc.put("src_country", sc.src_country)
-//                doc.put("src_region", sc.src_region)
-//                doc.put("dest_country", sc.dest_country)
-//                doc.put("dest_region", sc.dest_region)
-//                doc
-//              }).asJava)
-//            })
-//          }
-//        }
-//      })
+//      .queryName("Event Push Cassandra")
+//      .foreach(writerEvent)
 //      .start()
 
-    val eventHitCompanySecQuery = eventHitCompanySecDs
+//    val eventPushHDFS = eventDs
+//      .writeStream
+//      .format("json")
+//      .option("path", PropertiesLoader.hadoopEventFilePath)
+//      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
+//      .start()
+
+    val eventPushMongo = eventDs
       .writeStream
-      .outputMode("update")
-      .queryName("EventHitCompanyPerSec")
-      .foreach(writerEventHitCompanySec)
+      .outputMode("append")
+      .foreach(new ForeachWriter[Commons.EventObj] {
+
+        val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://hduser:jarkoM@10.252.108.98:27017/stevia.event?replicaSet=rs0&authSource=admin"))
+        var mongoConnector: MongoConnector = _
+        var events: mutable.ArrayBuffer[Commons.EventObj] = _
+
+        override def open(partitionId: Long, version: Long): Boolean = {
+          mongoConnector = MongoConnector(writeConfig.asOptions)
+          events = new mutable.ArrayBuffer[Commons.EventObj]()
+          true
+        }
+
+        override def process(value: Commons.EventObj): Unit = {
+          events.append(value)
+        }
+
+        override def close(errorOrNull: Throwable): Unit = {
+          if (events.nonEmpty) {
+            mongoConnector.withCollectionDo(writeConfig, { collection: MongoCollection[Document] =>
+              collection.insertMany(events.map(sc => {
+                val doc = new Document()
+                doc.put("ts", sc.ts)
+                doc.put("company", sc.company)
+                doc.put("device_id", sc.device_id)
+                doc.put("year", sc.year)
+                doc.put("month", sc.month)
+                doc.put("day", sc.day)
+                doc.put("hour", sc.hour)
+                doc.put("minute", sc.minute)
+                doc.put("second", sc.second)
+                doc.put("protocol", sc.protocol)
+                doc.put("ip_type", sc.ip_type)
+                doc.put("src_mac", sc.src_port)
+                doc.put("dest_mac", sc.dest_mac)
+                doc.put("src_ip", sc.src_ip)
+                doc.put("dest_ip", sc.dest_ip)
+                doc.put("src_port", sc.src_port)
+                doc.put("dest_port", sc.dest_port)
+                doc.put("alert_message", sc.alert_msg)
+                doc.put("classification", sc.classification)
+                doc.put("priority", sc.sig_id)
+                doc.put("sig_id", sc.sig_id)
+                doc.put("sig_gen", sc.sig_gen)
+                doc.put("sig_rev", sc.sig_rev)
+                doc.put("src_country", sc.src_country)
+                doc.put("src_region", sc.src_region)
+                doc.put("dest_country", sc.dest_country)
+                doc.put("dest_region", sc.dest_region)
+                doc
+              }).asJava)
+            })
+          }
+        }
+      })
       .start()
+
+//    val eventHitCompanySecQuery = eventHitCompanySecDs
+//      .writeStream
+//      .outputMode("update")
+//      .queryName("EventHitCompanyPerSec")
+//      .foreach(writerEventHitCompanySec)
+//      .start()
 
 //    val eventHitCompanySecKafkaQuery = eventHitCompanySecKafkaDs
 //      .writeStream
@@ -468,50 +468,50 @@ object RawDataStreamMisbah extends Utils {
 //      .option("checkpointLocation", PropertiesLoader.kafkaCheckpointLocation)
 //      .start()
 
-    val eventHitCompanyMinQuery = eventHitCompanyMinDs
-      .writeStream
-      .outputMode("update")
-      .queryName("EventHitCompanyPerMin")
-      .foreach(writerEventHitCompanyMin)
-      .start()
+//    val eventHitCompanyMinQuery = eventHitCompanyMinDs
+//      .writeStream
+//      .outputMode("update")
+//      .queryName("EventHitCompanyPerMin")
+//      .foreach(writerEventHitCompanyMin)
+//      .start()
+//
+//    val eventHitCompanyHourQuery = eventHitCompanyHourDs
+//      .writeStream
+//      .outputMode("update")
+//      .queryName("EventHitCompanyPerHour")
+//      .foreach(writerEventHitCompanyHour)
+//      .start()
+//
+//    val eventHitDeviceIdSecQuery = eventHitDeviceIdSecDs
+//      .writeStream
+//      .outputMode("update")
+//      .queryName("EventHitDeviceIdPerSec")
+//      .foreach(writerEventHitDeviceIdSec)
+//      .start()
+//
+//    val eventHitDeviceIdMinQuery = eventHitDeviceIdMinDs
+//      .writeStream
+//      .outputMode("update")
+//      .queryName("EventHitDeviceIdPerMin")
+//      .foreach(writerEventHitDeviceIdMin)
+//      .start()
+//
+//    val eventHitDeviceIdHourQuery = eventHitDeviceIdHourDs
+//      .writeStream
+//      .outputMode("update")
+//      .queryName("EventHitDeviceIdPerHour")
+//      .foreach(writerEventHitDeviceIdHour)
+//      .start()
 
-    val eventHitCompanyHourQuery = eventHitCompanyHourDs
-      .writeStream
-      .outputMode("update")
-      .queryName("EventHitCompanyPerHour")
-      .foreach(writerEventHitCompanyHour)
-      .start()
-
-    val eventHitDeviceIdSecQuery = eventHitDeviceIdSecDs
-      .writeStream
-      .outputMode("update")
-      .queryName("EventHitDeviceIdPerSec")
-      .foreach(writerEventHitDeviceIdSec)
-      .start()
-
-    val eventHitDeviceIdMinQuery = eventHitDeviceIdMinDs
-      .writeStream
-      .outputMode("update")
-      .queryName("EventHitDeviceIdPerMin")
-      .foreach(writerEventHitDeviceIdMin)
-      .start()
-
-    val eventHitDeviceIdHourQuery = eventHitDeviceIdHourDs
-      .writeStream
-      .outputMode("update")
-      .queryName("EventHitDeviceIdPerHour")
-      .foreach(writerEventHitDeviceIdHour)
-      .start()
-
-    eventPushQuery.awaitTermination()
-    eventPushHDFS.awaitTermination()
-//    eventPushMongo.awaitTermination()
+//    eventPushQuery.awaitTermination()
+//    eventPushHDFS.awaitTermination()
+    eventPushMongo.awaitTermination()
 //    eventHitCompanySecKafkaQuery.awaitTermination()
-    eventHitCompanySecQuery.awaitTermination()
-    eventHitCompanyMinQuery.awaitTermination()
-    eventHitCompanyHourQuery.awaitTermination()
-    eventHitDeviceIdSecQuery.awaitTermination()
-    eventHitDeviceIdMinQuery.awaitTermination()
-    eventHitDeviceIdHourQuery.awaitTermination()
+//    eventHitCompanySecQuery.awaitTermination()
+//    eventHitCompanyMinQuery.awaitTermination()
+//    eventHitCompanyHourQuery.awaitTermination()
+//    eventHitDeviceIdSecQuery.awaitTermination()
+//    eventHitDeviceIdMinQuery.awaitTermination()
+//    eventHitDeviceIdHourQuery.awaitTermination()
   }
 }

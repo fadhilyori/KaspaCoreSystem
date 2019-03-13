@@ -398,7 +398,7 @@ object RawDataStreamMongo extends Utils {
       .outputMode("append")
       .foreach(new ForeachWriter[Commons.EventObj] {
 
-        val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://hduser:jarkoM@10.252.108.98:27017/stevia.event?replicaSet=rs0&authSource=admin"))
+        val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://admin:jarkoM@157.230.241.208:27017/stevia.event?replicaSet=rs0&authSource=admin"))
         var mongoConnector: MongoConnector = _
         var events: mutable.ArrayBuffer[Commons.EventObj] = _
 

@@ -314,9 +314,10 @@ object RawDataStreamMongo extends Utils {
         window($"timestamp", "5 seconds").alias("windows"))
       .sum("value")
 
-    val signatureHitCompanyIdSecDf_2 = signatureHitCompanyIdSecDf_1.select($"company", $"alert_msg", $"windows.start" , $"sum(value)").map{
+    val signatureHitCompanyIdSecDf_2 = signatureHitCompanyIdSecDf_1.select($"alert_msg", $"windows.start" , $"sum(value)").map{
       r =>
-        val company = r.getAs[String](0)
+//        val company = r.getAs[String](0)
+        val company = "C307."
         val alert_msg = r.getAs[String](1)
 
         val epoch = r.getAs[Timestamp](2).getTime

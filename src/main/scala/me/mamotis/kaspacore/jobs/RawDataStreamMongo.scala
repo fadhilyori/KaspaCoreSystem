@@ -306,8 +306,7 @@ object RawDataStreamMongo extends Utils {
     val signatureHitCompanyIdSecDf_1 = parsedRawDf
       .select(
         to_utc_timestamp(from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType),
-        $"alert_msg",
-        $"company")
+        $"alert_msg")
       .withColumn("value", lit(1))
       .groupBy(
         $"alert_msg",

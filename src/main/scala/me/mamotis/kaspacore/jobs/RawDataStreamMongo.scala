@@ -530,7 +530,7 @@ object RawDataStreamMongo extends Utils {
 
     val eventPushMongoSig = signatureHitCompanyIdSecDs
       .writeStream
-      .outputMode("append")
+      .outputMode("update")
       .foreach(writerMongoSig)
       .start()
 

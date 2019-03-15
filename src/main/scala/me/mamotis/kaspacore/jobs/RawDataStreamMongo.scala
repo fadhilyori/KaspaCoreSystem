@@ -331,7 +331,7 @@ object RawDataStreamMongo extends Utils {
 
         val value = r.getAs[Long](3)
 
-        new Commons.SignatureHitCompanyObjSec()(
+        new Commons.SignatureHitCompanyObjSec(
           company, alert_msg, year, month, day, hour, minute, second, value
         )
     }.toDF(ColsArtifact.colsSignatureHitCompanyObjSec: _*)

@@ -273,7 +273,8 @@ object RawDataStreamMongo extends Utils {
 
     //+++++Hour
     val eventHitDeviceIdHourDf_1 = parsedRawDf.select(to_utc_timestamp(
-      from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType), $"device_id").withColumn("value", lit(1)
+      from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType), $"device_id")
+      .withColumn("value", lit(1)
     ).groupBy(
       $"device_id",
       window($"timestamp", "1 hours").alias("windows")
@@ -300,6 +301,43 @@ object RawDataStreamMongo extends Utils {
 
     val eventHitDeviceIdHourDs = eventHitDeviceIdHourDf_2.select($"device_id", $"year",
       $"month", $"day", $"hour", $"value").as[Commons.EventHitDeviceIdObjHour]
+
+
+    val signatureHitCompanyIdSecDf_1 = parsedRawDf
+      .select(
+        to_utc_timestamp(from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType),
+        $"alert_msg",
+        $"company")
+      .withColumn("value", lit(1))
+      .groupBy(
+        $"alert_msg",
+        window($"timestamp", "5 seconds").alias("windows"))
+      .sum("value")
+
+    val signatureHitCompanyIdSecDf_2 = signatureHitCompanyIdSecDf_1.select($"company", $"alert_msg", $"windows.start" , $"sum(value)").map{
+      r =>
+        val company = r.getAs[String](0)
+        val alert_msg = r.getAs[String](1)
+
+        val epoch = r.getAs[Timestamp](2).getTime
+
+        val date = new DateTime(epoch)
+        val year = date.getYear()
+        val month = date.getMonthOfYear()
+        val day = date.getDayOfMonth()
+        val hour = date.getHourOfDay()
+        val minute = date.getMinuteOfHour()
+        val second = date.getSecondOfMinute()
+
+        val value = r.getAs[Long](3)
+
+        new Commons.SignatureHitCompanyObjSec()(
+          company, alert_msg, year, month, day, hour, minute, second, value
+        )
+    }.toDF(ColsArtifact.colsSignatureHitCompanyObjSec: _*)
+
+    val signatureHitCompanyIdSecDs = signatureHitCompanyIdSecDf_2.select($"company", $"alert_msg", $"year",
+      $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.SignatureHitCompanyObjSec]
 
     //======================================================CASSANDRA WRITER======================================
 //    val writerEvent = new ForeachWriter[Commons.EventObj] {
@@ -372,31 +410,7 @@ object RawDataStreamMongo extends Utils {
 //      override def close(errorOrNull: Throwable): Unit = {}
 //    }
 
-    //====================================================WRITE QUERY=================================
-//    val eventConsoleQuery = eventDs
-//      .writeStream
-//      .outputMode("append")
-//      .format("console")
-//      .start().awaitTermination()
-
-//    val eventPushQuery = eventDs
-//      .writeStream
-//      .outputMode("append")
-//      .queryName("Event Push Cassandra")
-//      .foreach(writerEvent)
-//      .start()
-
-//    val eventPushHDFS = eventDs
-//      .writeStream
-//      .format("json")
-//      .option("path", PropertiesLoader.hadoopEventFilePath)
-//      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
-//      .start()
-
-    val eventPushMongo = eventDs
-      .writeStream
-      .outputMode("append")
-      .foreach(new ForeachWriter[Commons.EventObj] {
+      val writerMongo = new ForeachWriter[Commons.EventObj] {
 
         val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://admin:jarkoM@157.230.241.208:27017/stevia.event?replicaSet=rs0&authSource=admin"))
         var mongoConnector: MongoConnector = _
@@ -449,7 +463,75 @@ object RawDataStreamMongo extends Utils {
             })
           }
         }
-      })
+      }
+
+    val writerMongoSig = new ForeachWriter[Commons.SignatureHitCompanyObjSec] {
+
+      val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://admin:jarkoM@157.230.241.208:27017/stevia.eventSig?replicaSet=rs0&authSource=admin"))
+      var mongoConnector: MongoConnector = _
+      var events: mutable.ArrayBuffer[Commons.SignatureHitCompanyObjSec] = _
+
+      override def open(partitionId: Long, version: Long): Boolean = {
+        mongoConnector = MongoConnector(writeConfig.asOptions)
+        events = new mutable.ArrayBuffer[Commons.SignatureHitCompanyObjSec]()
+        true
+      }
+
+      override def process(value: Commons.SignatureHitCompanyObjSec): Unit = {
+        events.append(value)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {
+        if (events.nonEmpty) {
+          mongoConnector.withCollectionDo(writeConfig, { collection: MongoCollection[Document] =>
+            collection.insertMany(events.map(sc => {
+              val doc = new Document()
+              doc.put("company", sc.company)
+              doc.put("year", sc.year)
+              doc.put("month", sc.month)
+              doc.put("day", sc.day)
+              doc.put("hour", sc.hour)
+              doc.put("minute", sc.minute)
+              doc.put("second", sc.second)
+              doc.put("alert_message", sc.alert_msg)
+              doc
+            }).asJava)
+          })
+        }
+      }
+    }
+
+    //====================================================WRITE QUERY=================================
+//    val eventConsoleQuery = eventDs
+//      .writeStream
+//      .outputMode("append")
+//      .format("console")
+//      .start().awaitTermination()
+
+//    val eventPushQuery = eventDs
+//      .writeStream
+//      .outputMode("append")
+//      .queryName("Event Push Cassandra")
+//      .foreach(writerEvent)
+//      .start()
+
+//    val eventPushHDFS = eventDs
+//      .writeStream
+//      .format("json")
+//      .option("path", PropertiesLoader.hadoopEventFilePath)
+//      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
+//      .start()
+
+    val eventPushMongo = eventDs
+      .writeStream
+      .outputMode("append")
+      .foreach(writerMongo)
+      .start()
+
+    val eventPushMongoSig = signatureHitCompanyIdSecDs
+      .writeStream
+      .outputMode("append")
+      .foreach(writerMongoSig)
       .start()
 
 //    val eventHitCompanySecQuery = eventHitCompanySecDs
@@ -506,6 +588,7 @@ object RawDataStreamMongo extends Utils {
 //    eventPushQuery.awaitTermination()
 //    eventPushHDFS.awaitTermination()
     eventPushMongo.awaitTermination()
+    eventPushMongoSig.awaitTermination()
 //    eventHitCompanySecKafkaQuery.awaitTermination()
 //    eventHitCompanySecQuery.awaitTermination()
 //    eventHitCompanyMinQuery.awaitTermination()

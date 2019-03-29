@@ -144,7 +144,7 @@ object RawDataStreamMongo extends Utils {
 
     val eventHitCompanySecKafkaDs = eventHitCompanySecDf_2
       .withColumn("value", concat_ws(";", $"company", $"year", $"month", $"day", $"hour", $"minute",
-      $"second", $"value")).selectExpr("CAST(value AS STRING)")
+        $"second", $"value")).selectExpr("CAST(value AS STRING)")
 
     //+++++Minute
     val eventHitCompanyMinDf_1 = parsedRawDf.select(to_utc_timestamp(
@@ -275,7 +275,7 @@ object RawDataStreamMongo extends Utils {
     val eventHitDeviceIdHourDf_1 = parsedRawDf.select(to_utc_timestamp(
       from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType), $"device_id")
       .withColumn("value", lit(1)
-    ).groupBy(
+      ).groupBy(
       $"device_id",
       window($"timestamp", "1 hours").alias("windows")
     ).sum("value")
@@ -302,21 +302,23 @@ object RawDataStreamMongo extends Utils {
     val eventHitDeviceIdHourDs = eventHitDeviceIdHourDf_2.select($"device_id", $"year",
       $"month", $"day", $"hour", $"value").as[Commons.EventHitDeviceIdObjHour]
 
+    //region sliding 1 second
 
-    val signatureHitCompanyIdSecDf_1 = parsedRawDf
+    val signature1sDf_1 = parsedRawDf
       .select(
         to_utc_timestamp(from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType),
-        $"alert_msg")
+        $"alert_msg",
+        $"company")
       .withColumn("value", lit(1))
       .groupBy(
         $"alert_msg",
-        window($"timestamp", "5 seconds").alias("windows"))
+        $"company",
+        window($"timestamp", "1 second").alias("windows"))
       .sum("value")
 
-    val signatureHitCompanyIdSecDf_2 = signatureHitCompanyIdSecDf_1.select($"alert_msg", $"windows.start" , $"sum(value)").map{
+    val signature1sDf_2 = signature1sDf_1.select($"company", $"alert_msg", $"windows.start" , $"sum(value)").map{
       r =>
-//        val company = r.getAs[String](0)
-        val company = "C307."
+        val company = r.getAs[String](0)
         val alert_msg = r.getAs[String](1)
 
         val epoch = r.getAs[Timestamp](2).getTime
@@ -336,148 +338,150 @@ object RawDataStreamMongo extends Utils {
         )
     }.toDF(ColsArtifact.colsSignatureHitCompanyObjSec: _*)
 
-    val signatureHitCompanyIdSecDs = signatureHitCompanyIdSecDf_2.select($"company", $"alert_msg", $"year",
+    val signature1sDs = signature1sDf_2.select($"company", $"alert_msg", $"year",
       $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.SignatureHitCompanyObjSec]
 
-    //======================================================CASSANDRA WRITER======================================
-//    val writerEvent = new ForeachWriter[Commons.EventObj] {
-//      override def open(partitionId: Long, version: Long): Boolean = true
-//
-//      override def process(value: Commons.EventObj): Unit = {
-//        PushArtifact.pushRawData(value, connector)
-//      }
-//
-//      override def close(errorOrNull: Throwable): Unit = {}
-//    }
-//
-//    val writerEventHitCompanySec = new ForeachWriter[Commons.EventHitCompanyObjSec] {
-//      override def open(partitionId: Long, version: Long): Boolean = true
-//
-//      override def process(value: Commons.EventHitCompanyObjSec): Unit = {
-//        PushArtifact.pushEventHitCompanySec(value, connector)
-//      }
-//
-//      override def close(errorOrNull: Throwable): Unit = {}
-//    }
-//
-//    val writerEventHitCompanyMin = new ForeachWriter[Commons.EventHitCompanyObjMin] {
-//      override def open(partitionId: Long, version: Long): Boolean = true
-//
-//      override def process(value: Commons.EventHitCompanyObjMin): Unit = {
-//        PushArtifact.pushEventHitCompanyMin(value, connector)
-//      }
-//
-//      override def close(errorOrNull: Throwable): Unit = {}
-//    }
-//
-//    val writerEventHitCompanyHour = new ForeachWriter[Commons.EventHitCompanyObjHour] {
-//      override def open(partitionId: Long, version: Long): Boolean = true
-//
-//      override def process(value: Commons.EventHitCompanyObjHour): Unit = {
-//        PushArtifact.pushEventHitCompanyHour(value, connector)
-//      }
-//
-//      override def close(errorOrNull: Throwable): Unit = {}
-//    }
-//
-//    val writerEventHitDeviceIdSec = new ForeachWriter[Commons.EventHitDeviceIdObjSec] {
-//      override def open(partitionId: Long, version: Long): Boolean = true
-//
-//      override def process(value: Commons.EventHitDeviceIdObjSec): Unit = {
-//        PushArtifact.pushEventHitDeviceIdSec(value, connector)
-//      }
-//
-//      override def close(errorOrNull: Throwable): Unit = {}
-//    }
-//
-//    val writerEventHitDeviceIdMin = new ForeachWriter[Commons.EventHitDeviceIdObjMin] {
-//      override def open(partitionId: Long, version: Long): Boolean = true
-//
-//      override def process(value: Commons.EventHitDeviceIdObjMin): Unit = {
-//        PushArtifact.pushEventHitDeviceIdMin(value, connector)
-//      }
-//
-//      override def close(errorOrNull: Throwable): Unit = {}
-//    }
-//
-//    val writerEventHitDeviceIdHour = new ForeachWriter[Commons.EventHitDeviceIdObjHour] {
-//      override def open(partitionId: Long, version: Long): Boolean = true
-//
-//      override def process(value: Commons.EventHitDeviceIdObjHour): Unit = {
-//        PushArtifact.pushEventHitDeviceIdHour(value, connector)
-//      }
-//
-//      override def close(errorOrNull: Throwable): Unit = {}
-//    }
+    //endregion
 
-      val writerMongo = new ForeachWriter[Commons.EventObj] {
+    //region sliding 2 seconds
 
-        val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://admin:jarkoM@157.230.241.208:27017/stevia.event?replicaSet=rs0&authSource=admin"))
-        var mongoConnector: MongoConnector = _
-        var events: mutable.ArrayBuffer[Commons.EventObj] = _
+    val signature2sDf_1 = parsedRawDf
+      .select(
+        to_utc_timestamp(from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType),
+        $"alert_msg",
+        $"company")
+      .withColumn("value", lit(1))
+      .groupBy(
+        $"alert_msg",
+        $"company",
+        window($"timestamp", "2 seconds").alias("windows"))
+      .sum("value")
 
-        override def open(partitionId: Long, version: Long): Boolean = {
-          mongoConnector = MongoConnector(writeConfig.asOptions)
-          events = new mutable.ArrayBuffer[Commons.EventObj]()
-          true
-        }
+    val signature2sDf_2 = signature2sDf_1.select($"company", $"alert_msg", $"windows.start" , $"sum(value)").map{
+      r =>
+        val company = r.getAs[String](0)
+        val alert_msg = r.getAs[String](1)
 
-        override def process(value: Commons.EventObj): Unit = {
-          events.append(value)
-        }
+        val epoch = r.getAs[Timestamp](2).getTime
 
-        override def close(errorOrNull: Throwable): Unit = {
-          if (events.nonEmpty) {
-            mongoConnector.withCollectionDo(writeConfig, { collection: MongoCollection[Document] =>
-              collection.insertMany(events.map(sc => {
-                val doc = new Document()
-                doc.put("ts", sc.ts)
-                doc.put("company", sc.company)
-                doc.put("device_id", sc.device_id)
-                doc.put("year", sc.year)
-                doc.put("month", sc.month)
-                doc.put("day", sc.day)
-                doc.put("hour", sc.hour)
-                doc.put("minute", sc.minute)
-                doc.put("second", sc.second)
-                doc.put("protocol", sc.protocol)
-                doc.put("ip_type", sc.ip_type)
-                doc.put("src_mac", sc.src_port)
-                doc.put("dest_mac", sc.dest_mac)
-                doc.put("src_ip", sc.src_ip)
-                doc.put("dest_ip", sc.dest_ip)
-                doc.put("src_port", sc.src_port)
-                doc.put("dest_port", sc.dest_port)
-                doc.put("alert_message", sc.alert_msg)
-                doc.put("classification", sc.classification)
-                doc.put("priority", sc.sig_id)
-                doc.put("sig_id", sc.sig_id)
-                doc.put("sig_gen", sc.sig_gen)
-                doc.put("sig_rev", sc.sig_rev)
-                doc.put("src_country", sc.src_country)
-                doc.put("src_region", sc.src_region)
-                doc.put("dest_country", sc.dest_country)
-                doc.put("dest_region", sc.dest_region)
-                doc
-              }).asJava)
-            })
-          }
-        }
-      }
+        val date = new DateTime(epoch)
+        val year = date.getYear()
+        val month = date.getMonthOfYear()
+        val day = date.getDayOfMonth()
+        val hour = date.getHourOfDay()
+        val minute = date.getMinuteOfHour()
+        val second = date.getSecondOfMinute()
 
-    val writerMongoSig = new ForeachWriter[Commons.SignatureHitCompanyObjSec] {
+        val value = r.getAs[Long](3)
 
-      val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://admin:jarkoM@157.230.241.208:27017/stevia.eventSig?replicaSet=rs0&authSource=admin"))
+        new Commons.SignatureHitCompanyObjSec(
+          company, alert_msg, year, month, day, hour, minute, second, value
+        )
+    }.toDF(ColsArtifact.colsSignatureHitCompanyObjSec: _*)
+
+    val signature2sDs = signature2sDf_2.select($"company", $"alert_msg", $"year",
+      $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.SignatureHitCompanyObjSec]
+
+    //endregion 2
+
+    //region sliding 3 seconds
+
+    val signature3sDf_1 = parsedRawDf
+      .select(
+        to_utc_timestamp(from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType),
+        $"alert_msg",
+        $"company")
+      .withColumn("value", lit(1))
+      .groupBy(
+        $"alert_msg",
+        $"company",
+        window($"timestamp", "3 seconds").alias("windows"))
+      .sum("value")
+
+    val signature3sDf_2 = signature3sDf_1.select($"company", $"alert_msg", $"windows.start" , $"sum(value)").map{
+      r =>
+        val company = r.getAs[String](0)
+        val alert_msg = r.getAs[String](1)
+
+        val epoch = r.getAs[Timestamp](2).getTime
+
+        val date = new DateTime(epoch)
+        val year = date.getYear()
+        val month = date.getMonthOfYear()
+        val day = date.getDayOfMonth()
+        val hour = date.getHourOfDay()
+        val minute = date.getMinuteOfHour()
+        val second = date.getSecondOfMinute()
+
+        val value = r.getAs[Long](3)
+
+        new Commons.SignatureHitCompanyObjSec(
+          company, alert_msg, year, month, day, hour, minute, second, value
+        )
+    }.toDF(ColsArtifact.colsSignatureHitCompanyObjSec: _*)
+
+    val signature3sDs = signature3sDf_2.select($"company", $"alert_msg", $"year",
+      $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.SignatureHitCompanyObjSec]
+
+    //endregion
+
+    //region sliding 5 seconds
+
+    val signature5sDf_1 = parsedRawDf
+      .select(
+        to_utc_timestamp(from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType),
+        $"alert_msg",
+        $"company")
+      .withColumn("value", lit(1))
+      .groupBy(
+        $"alert_msg",
+        $"company",
+        window($"timestamp", "5 seconds").alias("windows"))
+      .sum("value")
+
+    val signature5sDf_2 = signature5sDf_1.select($"company", $"alert_msg", $"windows.start" , $"sum(value)").map{
+      r =>
+        val company = r.getAs[String](0)
+        val alert_msg = r.getAs[String](1)
+
+        val epoch = r.getAs[Timestamp](2).getTime
+
+        val date = new DateTime(epoch)
+        val year = date.getYear()
+        val month = date.getMonthOfYear()
+        val day = date.getDayOfMonth()
+        val hour = date.getHourOfDay()
+        val minute = date.getMinuteOfHour()
+        val second = date.getSecondOfMinute()
+
+        val value = r.getAs[Long](3)
+
+        new Commons.SignatureHitCompanyObjSec(
+          company, alert_msg, year, month, day, hour, minute, second, value
+        )
+    }.toDF(ColsArtifact.colsSignatureHitCompanyObjSec: _*)
+
+    val signature5sDs = signature5sDf_2.select($"company", $"alert_msg", $"year",
+      $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.SignatureHitCompanyObjSec]
+
+    //endregion
+
+    //======================================================MONGO WRITER======================================
+
+
+    val writerMongo = new ForeachWriter[Commons.EventObj] {
+
+      val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://admin:jarkoM@157.230.241.208:27017/stevia.event?replicaSet=rs0&authSource=admin"))
       var mongoConnector: MongoConnector = _
-      var events: mutable.ArrayBuffer[Commons.SignatureHitCompanyObjSec] = _
+      var events: mutable.ArrayBuffer[Commons.EventObj] = _
 
       override def open(partitionId: Long, version: Long): Boolean = {
         mongoConnector = MongoConnector(writeConfig.asOptions)
-        events = new mutable.ArrayBuffer[Commons.SignatureHitCompanyObjSec]()
+        events = new mutable.ArrayBuffer[Commons.EventObj]()
         true
       }
 
-      override def process(value: Commons.SignatureHitCompanyObjSec): Unit = {
+      override def process(value: Commons.EventObj): Unit = {
         events.append(value)
       }
 
@@ -486,14 +490,33 @@ object RawDataStreamMongo extends Utils {
           mongoConnector.withCollectionDo(writeConfig, { collection: MongoCollection[Document] =>
             collection.insertMany(events.map(sc => {
               val doc = new Document()
+              doc.put("ts", sc.ts)
               doc.put("company", sc.company)
+              doc.put("device_id", sc.device_id)
               doc.put("year", sc.year)
               doc.put("month", sc.month)
               doc.put("day", sc.day)
               doc.put("hour", sc.hour)
               doc.put("minute", sc.minute)
               doc.put("second", sc.second)
+              doc.put("protocol", sc.protocol)
+              doc.put("ip_type", sc.ip_type)
+              doc.put("src_mac", sc.src_port)
+              doc.put("dest_mac", sc.dest_mac)
+              doc.put("src_ip", sc.src_ip)
+              doc.put("dest_ip", sc.dest_ip)
+              doc.put("src_port", sc.src_port)
+              doc.put("dest_port", sc.dest_port)
               doc.put("alert_message", sc.alert_msg)
+              doc.put("classification", sc.classification)
+              doc.put("priority", sc.sig_id)
+              doc.put("sig_id", sc.sig_id)
+              doc.put("sig_gen", sc.sig_gen)
+              doc.put("sig_rev", sc.sig_rev)
+              doc.put("src_country", sc.src_country)
+              doc.put("src_region", sc.src_region)
+              doc.put("dest_country", sc.dest_country)
+              doc.put("dest_region", sc.dest_region)
               doc
             }).asJava)
           })
@@ -501,100 +524,89 @@ object RawDataStreamMongo extends Utils {
       }
     }
 
+//    val writerMongoSig =
+    def writerMongoSig(urlConnectMongo : String) : ForeachWriter[Commons.SignatureHitCompanyObjSec] = {
+      return new ForeachWriter[Commons.SignatureHitCompanyObjSec] {
+
+        val writeConfig: WriteConfig = WriteConfig(Map("uri" -> urlConnectMongo))
+        var mongoConnector: MongoConnector = _
+        var events: mutable.ArrayBuffer[Commons.SignatureHitCompanyObjSec] = _
+
+        override def open(partitionId: Long, version: Long): Boolean = {
+          mongoConnector = MongoConnector(writeConfig.asOptions)
+          events = new mutable.ArrayBuffer[Commons.SignatureHitCompanyObjSec]()
+          true
+        }
+
+        override def process(value: Commons.SignatureHitCompanyObjSec): Unit = {
+          events.append(value)
+        }
+
+        override def close(errorOrNull: Throwable): Unit = {
+          if (events.nonEmpty) {
+            mongoConnector.withCollectionDo(writeConfig, { collection: MongoCollection[Document] =>
+              collection.insertMany(events.map(sc => {
+                val doc = new Document()
+                doc.put("company", sc.company)
+                doc.put("year", sc.year)
+                doc.put("month", sc.month)
+                doc.put("day", sc.day)
+                doc.put("hour", sc.hour)
+                doc.put("minute", sc.minute)
+                doc.put("second", sc.second)
+                doc.put("alert_message", sc.alert_msg)
+                doc.put("value", sc.value)
+                doc
+              }).asJava)
+            })
+          }
+        }
+      }
+    }
+
     //====================================================WRITE QUERY=================================
-//    val eventConsoleQuery = eventDs
-//      .writeStream
-//      .outputMode("append")
-//      .format("console")
-//      .start().awaitTermination()
-
-//    val eventPushQuery = eventDs
-//      .writeStream
-//      .outputMode("append")
-//      .queryName("Event Push Cassandra")
-//      .foreach(writerEvent)
-//      .start()
-
-//    val eventPushHDFS = eventDs
-//      .writeStream
-//      .format("json")
-//      .option("path", PropertiesLoader.hadoopEventFilePath)
-//      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
-//      .start()
 
     val eventPushMongo = eventDs
       .writeStream
       .outputMode("append")
+      .queryName("Event Push Mongo")
       .foreach(writerMongo)
       .start()
 
-    val eventPushMongoSig = signatureHitCompanyIdSecDs
+    val eventPushMongoSig1s = signature1sDs
       .writeStream
       .outputMode("update")
-      .foreach(writerMongoSig)
+      .queryName("Event Push Mongo 1s Window")
+      .foreach(writerMongoSig("mongodb://admin:jarkoM@157.230.241.208:27017/stevia.event1s?replicaSet=rs0&authSource=admin"))
       .start()
 
-//    val eventHitCompanySecQuery = eventHitCompanySecDs
-//      .writeStream
-//      .outputMode("update")
-//      .queryName("EventHitCompanyPerSec")
-//      .foreach(writerEventHitCompanySec)
-//      .start()
+    val eventPushMongoSig2s = signature2sDs
+      .writeStream
+      .outputMode("update")
+      .queryName("Event Push Mongo 2s Window")
+      .foreach(writerMongoSig("mongodb://admin:jarkoM@157.230.241.208:27017/stevia.event2s?replicaSet=rs0&authSource=admin"))
+      .start()
 
-//    val eventHitCompanySecKafkaQuery = eventHitCompanySecKafkaDs
-//      .writeStream
-//      .format("kafka")
-//      .outputMode("update")
-//      .option("kafka.bootstrap.servers", PropertiesLoader.kafkaBrokerUrlOutput)
-//      .option("topic", PropertiesLoader.kafkaOutputTopic)
-//      .option("checkpointLocation", PropertiesLoader.kafkaCheckpointLocation)
-//      .start()
+    val eventPushMongoSig3s = signature3sDs
+      .writeStream
+      .outputMode("update")
+      .queryName("Event Push Mongo 3s Window")
+      .foreach(writerMongoSig("mongodb://admin:jarkoM@157.230.241.208:27017/stevia.event3s?replicaSet=rs0&authSource=admin"))
+      .start()
 
-//    val eventHitCompanyMinQuery = eventHitCompanyMinDs
-//      .writeStream
-//      .outputMode("update")
-//      .queryName("EventHitCompanyPerMin")
-//      .foreach(writerEventHitCompanyMin)
-//      .start()
-//
-//    val eventHitCompanyHourQuery = eventHitCompanyHourDs
-//      .writeStream
-//      .outputMode("update")
-//      .queryName("EventHitCompanyPerHour")
-//      .foreach(writerEventHitCompanyHour)
-//      .start()
-//
-//    val eventHitDeviceIdSecQuery = eventHitDeviceIdSecDs
-//      .writeStream
-//      .outputMode("update")
-//      .queryName("EventHitDeviceIdPerSec")
-//      .foreach(writerEventHitDeviceIdSec)
-//      .start()
-//
-//    val eventHitDeviceIdMinQuery = eventHitDeviceIdMinDs
-//      .writeStream
-//      .outputMode("update")
-//      .queryName("EventHitDeviceIdPerMin")
-//      .foreach(writerEventHitDeviceIdMin)
-//      .start()
-//
-//    val eventHitDeviceIdHourQuery = eventHitDeviceIdHourDs
-//      .writeStream
-//      .outputMode("update")
-//      .queryName("EventHitDeviceIdPerHour")
-//      .foreach(writerEventHitDeviceIdHour)
-//      .start()
+    val eventPushMongoSig5s = signature5sDs
+      .writeStream
+      .outputMode("update")
+      .queryName("Event Push Mongo 5s Window")
+      .foreach(writerMongoSig("mongodb://admin:jarkoM@157.230.241.208:27017/stevia.event5s?replicaSet=rs0&authSource=admin"))
+      .start()
 
-//    eventPushQuery.awaitTermination()
-//    eventPushHDFS.awaitTermination()
+
+
     eventPushMongo.awaitTermination()
-    eventPushMongoSig.awaitTermination()
-//    eventHitCompanySecKafkaQuery.awaitTermination()
-//    eventHitCompanySecQuery.awaitTermination()
-//    eventHitCompanyMinQuery.awaitTermination()
-//    eventHitCompanyHourQuery.awaitTermination()
-//    eventHitDeviceIdSecQuery.awaitTermination()
-//    eventHitDeviceIdMinQuery.awaitTermination()
-//    eventHitDeviceIdHourQuery.awaitTermination()
+    eventPushMongoSig1s.awaitTermination()
+    eventPushMongoSig2s.awaitTermination()
+    eventPushMongoSig3s.awaitTermination()
+    eventPushMongoSig5s.awaitTermination()
   }
 }

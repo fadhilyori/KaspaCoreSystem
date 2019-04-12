@@ -108,6 +108,7 @@ object RawDataStreamMongo extends Utils {
       $"sig_id", $"sig_gen", $"sig_rev", $"src_country", $"src_region",
       $"dest_country", $"dest_region").as[Commons.EventObj]
 
+    //region lawas
 
     //+++++++++++++Push Event Hit Company per Second++++++++++++++++++++++
     //+++++Second
@@ -302,6 +303,8 @@ object RawDataStreamMongo extends Utils {
     val eventHitDeviceIdHourDs = eventHitDeviceIdHourDf_2.select($"device_id", $"year",
       $"month", $"day", $"hour", $"value").as[Commons.EventHitDeviceIdObjHour]
 
+    //endregion
+
     //region sliding 1 second
 
     val signature1sDf_1 = parsedRawDf
@@ -471,7 +474,7 @@ object RawDataStreamMongo extends Utils {
 
     val writerMongo = new ForeachWriter[Commons.EventObj] {
 
-      val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://admin:jarkoM@157.230.241.208:27017/stevia.event?replicaSet=rs0&authSource=admin"))
+      val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event?replicaSet=rs0&authSource=admin"))
       var mongoConnector: MongoConnector = _
       var events: mutable.ArrayBuffer[Commons.EventObj] = _
 
@@ -524,7 +527,7 @@ object RawDataStreamMongo extends Utils {
       }
     }
 
-//    val writerMongoSig =
+    //    val writerMongoSig =
     def writerMongoSig(urlConnectMongo : String) : ForeachWriter[Commons.SignatureHitCompanyObjSec] = {
       return new ForeachWriter[Commons.SignatureHitCompanyObjSec] {
 
@@ -573,40 +576,41 @@ object RawDataStreamMongo extends Utils {
       .foreach(writerMongo)
       .start()
 
-    val eventPushMongoSig1s = signature1sDs
-      .writeStream
-      .outputMode("update")
-      .queryName("Event Push Mongo 1s Window")
-      .foreach(writerMongoSig("mongodb://admin:jarkoM@157.230.241.208:27017/stevia.event1s?replicaSet=rs0&authSource=admin"))
-      .start()
+        val eventPushMongoSig1s = signature1sDs
+          .writeStream
+          .outputMode("update")
+          .queryName("Event Push Mongo 1s Window")
+          .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event1s?replicaSet=rs0&authSource=admin"))
+          .start()
 
-    val eventPushMongoSig2s = signature2sDs
-      .writeStream
-      .outputMode("update")
-      .queryName("Event Push Mongo 2s Window")
-      .foreach(writerMongoSig("mongodb://admin:jarkoM@157.230.241.208:27017/stevia.event2s?replicaSet=rs0&authSource=admin"))
-      .start()
+        val eventPushMongoSig2s = signature2sDs
+          .writeStream
+          .outputMode("update")
+          .queryName("Event Push Mongo 2s Window")
+          .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event2s?replicaSet=rs0&authSource=admin"))
+          .start()
 
-    val eventPushMongoSig3s = signature3sDs
-      .writeStream
-      .outputMode("update")
-      .queryName("Event Push Mongo 3s Window")
-      .foreach(writerMongoSig("mongodb://admin:jarkoM@157.230.241.208:27017/stevia.event3s?replicaSet=rs0&authSource=admin"))
-      .start()
+        val eventPushMongoSig3s = signature3sDs
+          .writeStream
+          .outputMode("update")
+          .queryName("Event Push Mongo 3s Window")
+          .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event3s?replicaSet=rs0&authSource=admin"))
+          .start()
 
     val eventPushMongoSig5s = signature5sDs
       .writeStream
       .outputMode("update")
       .queryName("Event Push Mongo 5s Window")
-      .foreach(writerMongoSig("mongodb://admin:jarkoM@157.230.241.208:27017/stevia.event5s?replicaSet=rs0&authSource=admin"))
+      .format("console")
+      .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event5s?replicaSet=rs0&authSource=admin"))
       .start()
 
+    //    eventPushMongo.awaitTermination()
+    //    eventPushMongoSig1s.awaitTermination()
+    //    eventPushMongoSig2s.awaitTermination()
+    //    eventPushMongoSig3s.awaitTermination()
+    //    eventPushMongoSig5s.awaitTermination()
 
-
-    eventPushMongo.awaitTermination()
-    eventPushMongoSig1s.awaitTermination()
-    eventPushMongoSig2s.awaitTermination()
-    eventPushMongoSig3s.awaitTermination()
-    eventPushMongoSig5s.awaitTermination()
+    sparkSession.streams.awaitAnyTermination()
   }
 }

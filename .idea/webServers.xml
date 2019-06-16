@@ -2,8 +2,16 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="10bfeceb-46e9-49cd-8d75-64dd069e9568" name="BigData" url="http://157.230.241.208">
-        <fileTransfer host="157.230.241.208" port="22" rootFolder="/home/hduser/yusril" accessType="SFTP">
+      <webServer id="6b6cf815-e866-4c6c-a7aa-27bb1055651b" name="master-ryzen" url="http://10.8.0.2">
+        <fileTransfer host="10.8.0.2" port="22" rootFolder="/home/hduser/yusril" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="1a06539e-7e1f-440d-983b-9f3d61a3acac" name="master-bppt" url="http://202.46.4.52">
+        <fileTransfer host="202.46.4.52" port="22" rootFolder="/home/hduser" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>

@@ -57,7 +57,8 @@ object RawDataStreamMongo extends Utils {
 
     //======================================DATAFRAME PARSING==================================
 
-    //+++++++++++Raw Data++++++++++++++
+    //region +++++++++++Raw Data++++++++++++++
+
     val eventDf = parsedRawDf.select(
       $"timestamp", $"device_id", $"protocol", $"ip_type", $"src_mac", $"dest_mac", $"src_ip",
       $"dest_ip", $"src_port", $"dst_port", $"alert_msg", $"classification", $"priority", $"sig_id",
@@ -107,6 +108,8 @@ object RawDataStreamMongo extends Utils {
       $"dest_port", $"alert_msg", $"classification", $"priority",
       $"sig_id", $"sig_gen", $"sig_rev", $"src_country", $"src_region",
       $"dest_country", $"dest_region").as[Commons.EventObj]
+
+    //endregion
 
     //region lawas
 
@@ -311,15 +314,19 @@ object RawDataStreamMongo extends Utils {
       .select(
         to_utc_timestamp(from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType),
         $"alert_msg",
+        $"src_ip",
+        $"dest_ip",
         $"company")
       .withColumn("value", lit(1))
       .groupBy(
         $"alert_msg",
+        $"src_ip",
+        $"dest_ip",
         $"company",
         window($"timestamp", "1 second").alias("windows"))
       .sum("value")
 
-    val signature1sDf_2 = signature1sDf_1.select($"company", $"alert_msg", $"windows.start" , $"sum(value)").map{
+    val signature1sDf_2 = signature1sDf_1.select($"company", $"alert_msg", $"windows.start", $"sum(value)", $"src_ip", $"dest_ip").map{
       r =>
         val company = r.getAs[String](0)
         val alert_msg = r.getAs[String](1)
@@ -336,13 +343,18 @@ object RawDataStreamMongo extends Utils {
 
         val value = r.getAs[Long](3)
 
-        new Commons.SignatureHitCompanyObjSec(
-          company, alert_msg, year, month, day, hour, minute, second, value
-        )
-    }.toDF(ColsArtifact.colsSignatureHitCompanyObjSec: _*)
+        val src_ip = r.getAs[String](4)
+        val dest_ip = r.getAs[String](5)
+        val src_country = Tools.IpLookupCountry(src_ip)
+        val dest_country = Tools.IpLookupCountry(dest_ip)
 
-    val signature1sDs = signature1sDf_2.select($"company", $"alert_msg", $"year",
-      $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.SignatureHitCompanyObjSec]
+        new Commons.SteviaObjSec(
+          company, alert_msg, src_country, dest_country, year, month, day, hour, minute, second, value
+        )
+    }.toDF(ColsArtifact.colsSteviaObjSec: _*)
+
+    val signature1sDs = signature1sDf_2.select($"company", $"alert_msg", $"src_country", $"dest_country", $"year",
+      $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.SteviaObjSec]
 
     //endregion
 
@@ -528,20 +540,20 @@ object RawDataStreamMongo extends Utils {
     }
 
     //    val writerMongoSig =
-    def writerMongoSig(urlConnectMongo : String) : ForeachWriter[Commons.SignatureHitCompanyObjSec] = {
-      return new ForeachWriter[Commons.SignatureHitCompanyObjSec] {
+    def writerMongoSig(urlConnectMongo : String) : ForeachWriter[Commons.SteviaObjSec] = {
+      return new ForeachWriter[Commons.SteviaObjSec] {
 
         val writeConfig: WriteConfig = WriteConfig(Map("uri" -> urlConnectMongo))
         var mongoConnector: MongoConnector = _
-        var events: mutable.ArrayBuffer[Commons.SignatureHitCompanyObjSec] = _
+        var events: mutable.ArrayBuffer[Commons.SteviaObjSec] = _
 
         override def open(partitionId: Long, version: Long): Boolean = {
           mongoConnector = MongoConnector(writeConfig.asOptions)
-          events = new mutable.ArrayBuffer[Commons.SignatureHitCompanyObjSec]()
+          events = new mutable.ArrayBuffer[Commons.SteviaObjSec]()
           true
         }
 
-        override def process(value: Commons.SignatureHitCompanyObjSec): Unit = {
+        override def process(value: Commons.SteviaObjSec): Unit = {
           events.append(value)
         }
 
@@ -558,6 +570,8 @@ object RawDataStreamMongo extends Utils {
                 doc.put("minute", sc.minute)
                 doc.put("second", sc.second)
                 doc.put("alert_message", sc.alert_msg)
+                doc.put("src_country", sc.src_country)
+                doc.put("dest_country", sc.dest_country)
                 doc.put("value", sc.value)
                 doc
               }).asJava)
@@ -576,34 +590,34 @@ object RawDataStreamMongo extends Utils {
       .foreach(writerMongo)
       .start()
 
-        val eventPushMongoSig1s = signature1sDs
-          .writeStream
-          .outputMode("update")
-          .queryName("Event Push Mongo 1s Window")
-          .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event1s?replicaSet=rs0&authSource=admin"))
-          .start()
-
-        val eventPushMongoSig2s = signature2sDs
-          .writeStream
-          .outputMode("update")
-          .queryName("Event Push Mongo 2s Window")
-          .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event2s?replicaSet=rs0&authSource=admin"))
-          .start()
-
-        val eventPushMongoSig3s = signature3sDs
-          .writeStream
-          .outputMode("update")
-          .queryName("Event Push Mongo 3s Window")
-          .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event3s?replicaSet=rs0&authSource=admin"))
-          .start()
-
-    val eventPushMongoSig5s = signature5sDs
+    val eventPushMongoSig1s = signature1sDs
       .writeStream
       .outputMode("update")
-      .queryName("Event Push Mongo 5s Window")
-      .format("console")
-      .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event5s?replicaSet=rs0&authSource=admin"))
+      .queryName("Event Push Mongo 1s Window")
+      .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event1s?replicaSet=rs0&authSource=admin"))
       .start()
+
+//    val eventPushMongoSig2s = signature2sDs
+//      .writeStream
+//      .outputMode("update")
+//      .queryName("Event Push Mongo 2s Window")
+//      .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event2s?replicaSet=rs0&authSource=admin"))
+//      .start()
+//
+//    val eventPushMongoSig3s = signature3sDs
+//      .writeStream
+//      .outputMode("update")
+//      .queryName("Event Push Mongo 3s Window")
+//      .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event3s?replicaSet=rs0&authSource=admin"))
+//      .start()
+//
+//    val eventPushMongoSig5s = signature5sDs
+//      .writeStream
+//      .outputMode("update")
+//      .queryName("Event Push Mongo 5s Window")
+//      .format("console")
+//      .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event5s?replicaSet=rs0&authSource=admin"))
+//      .start()
 
     //    eventPushMongo.awaitTermination()
     //    eventPushMongoSig1s.awaitTermination()

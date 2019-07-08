@@ -349,11 +349,11 @@ object RawDataStreamMongo extends Utils {
         val dest_country = Tools.IpLookupCountry(dest_ip)
 
         new Commons.SteviaObjSec(
-          company, alert_msg, src_country, dest_country, year, month, day, hour, minute, second, value
+          company, alert_msg, src_ip, src_country, dest_ip, dest_country, year, month, day, hour, minute, second, value
         )
     }.toDF(ColsArtifact.colsSteviaObjSec: _*)
 
-    val signature1sDs = signature1sDf_2.select($"company", $"alert_msg", $"src_country", $"dest_country", $"year",
+    val signature1sDs = signature1sDf_2.select($"company", $"alert_msg", $"src_ip", $"src_country", $"dest_ip", $"dest_country", $"year",
       $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.SteviaObjSec]
 
     //endregion

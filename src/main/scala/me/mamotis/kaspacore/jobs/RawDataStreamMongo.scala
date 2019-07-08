@@ -570,7 +570,9 @@ object RawDataStreamMongo extends Utils {
                 doc.put("minute", sc.minute)
                 doc.put("second", sc.second)
                 doc.put("alert_message", sc.alert_msg)
+                doc.put("src_ip", sc.src_ip)
                 doc.put("src_country", sc.src_country)
+                doc.put("dest_ip", sc.dest_ip)
                 doc.put("dest_country", sc.dest_country)
                 doc.put("value", sc.value)
                 doc

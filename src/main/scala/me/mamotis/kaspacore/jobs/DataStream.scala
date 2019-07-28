@@ -16,7 +16,7 @@ import org.joda.time.DateTime
 import scala.collection.mutable
 import scala.collection.JavaConverters._
 
-object RawDataStreamMongo extends Utils {
+object DataStream extends Utils {
 
   def main(args: Array[String]): Unit = {
     //=================================AVRO DESERIALIZER====================================
@@ -34,7 +34,7 @@ object RawDataStreamMongo extends Utils {
 
 
     // Cassandra Connector
-    //val connector = getCassandraSession(sparkContext)
+    val connector = getCassandraSession(sparkContext)
 
     // set implicit and log level
     import sparkSession.implicits._
@@ -277,8 +277,7 @@ object RawDataStreamMongo extends Utils {
 
     //+++++Hour
     val eventHitDeviceIdHourDf_1 = parsedRawDf.select(to_utc_timestamp(
-      from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType), $"device_id")
-      .withColumn("value", lit(1)
+      from_unixtime($"timestamp"), "GMT").alias("timestamp").cast(StringType), $"device_id").withColumn("value", lit(1)
       ).groupBy(
       $"device_id",
       window($"timestamp", "1 hours").alias("windows")
@@ -483,7 +482,6 @@ object RawDataStreamMongo extends Utils {
 
     //======================================================MONGO WRITER======================================
 
-
     val writerMongo = new ForeachWriter[Commons.EventObj] {
 
       val writeConfig: WriteConfig = WriteConfig(Map("uri" -> "mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event?replicaSet=rs0&authSource=admin"))
@@ -583,6 +581,77 @@ object RawDataStreamMongo extends Utils {
       }
     }
 
+    //======================================================CASSANDRA WRITER======================================
+    val writerEvent = new ForeachWriter[Commons.EventObj] {
+      override def open(partitionId: Long, version: Long): Boolean = true
+
+      override def process(value: Commons.EventObj): Unit = {
+        PushArtifact.pushRawData(value, connector)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {}
+    }
+
+    val writerEventHitCompanySec = new ForeachWriter[Commons.EventHitCompanyObjSec] {
+      override def open(partitionId: Long, version: Long): Boolean = true
+
+      override def process(value: Commons.EventHitCompanyObjSec): Unit = {
+        PushArtifact.pushEventHitCompanySec(value, connector)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {}
+    }
+
+    val writerEventHitCompanyMin = new ForeachWriter[Commons.EventHitCompanyObjMin] {
+      override def open(partitionId: Long, version: Long): Boolean = true
+
+      override def process(value: Commons.EventHitCompanyObjMin): Unit = {
+        PushArtifact.pushEventHitCompanyMin(value, connector)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {}
+    }
+
+    val writerEventHitCompanyHour = new ForeachWriter[Commons.EventHitCompanyObjHour] {
+      override def open(partitionId: Long, version: Long): Boolean = true
+
+      override def process(value: Commons.EventHitCompanyObjHour): Unit = {
+        PushArtifact.pushEventHitCompanyHour(value, connector)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {}
+    }
+
+    val writerEventHitDeviceIdSec = new ForeachWriter[Commons.EventHitDeviceIdObjSec] {
+      override def open(partitionId: Long, version: Long): Boolean = true
+
+      override def process(value: Commons.EventHitDeviceIdObjSec): Unit = {
+        PushArtifact.pushEventHitDeviceIdSec(value, connector)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {}
+    }
+
+    val writerEventHitDeviceIdMin = new ForeachWriter[Commons.EventHitDeviceIdObjMin] {
+      override def open(partitionId: Long, version: Long): Boolean = true
+
+      override def process(value: Commons.EventHitDeviceIdObjMin): Unit = {
+        PushArtifact.pushEventHitDeviceIdMin(value, connector)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {}
+    }
+
+    val writerEventHitDeviceIdHour = new ForeachWriter[Commons.EventHitDeviceIdObjHour] {
+      override def open(partitionId: Long, version: Long): Boolean = true
+
+      override def process(value: Commons.EventHitDeviceIdObjHour): Unit = {
+        PushArtifact.pushEventHitDeviceIdHour(value, connector)
+      }
+
+      override def close(errorOrNull: Throwable): Unit = {}
+    }
+
     //====================================================WRITE QUERY=================================
 
     val eventPushMongo = eventDs
@@ -591,6 +660,55 @@ object RawDataStreamMongo extends Utils {
       .queryName("Event Push Mongo")
       .foreach(writerMongo)
       .start()
+
+    val eventPushHDFS = eventDs
+      .writeStream
+      .format("json")
+      .option("path", PropertiesLoader.hadoopEventFilePath)
+      .option("checkpointLocation", PropertiesLoader.checkpointLocation)
+      .start()
+
+    val eventHitCompanySecQuery = eventHitCompanySecDs
+      .writeStream
+      .outputMode("update")
+      .queryName("EventHitCompanyPerSec")
+      .foreach(writerEventHitCompanySec)
+      .start()
+
+    val eventHitCompanyMinQuery = eventHitCompanyMinDs
+      .writeStream
+      .outputMode("update")
+      .queryName("EventHitCompanyPerMin")
+      .foreach(writerEventHitCompanyMin)
+      .start()
+
+    val eventHitCompanyHourQuery = eventHitCompanyHourDs
+      .writeStream
+      .outputMode("update")
+      .queryName("EventHitCompanyPerHour")
+      .foreach(writerEventHitCompanyHour)
+      .start()
+
+    val eventHitDeviceIdSecQuery = eventHitDeviceIdSecDs
+      .writeStream
+      .outputMode("update")
+      .queryName("EventHitDeviceIdPerSec")
+      .foreach(writerEventHitDeviceIdSec)
+      .start()
+
+    val eventHitDeviceIdMinQuery = eventHitDeviceIdMinDs
+      .writeStream
+      .outputMode("update")
+      .queryName("EventHitDeviceIdPerMin")
+      .foreach(writerEventHitDeviceIdMin)
+      .start()
+
+    val eventHitDeviceIdHourQuery = eventHitDeviceIdHourDs
+      .writeStream
+      .outputMode("update")
+      .queryName("EventHitDeviceIdPerHour")
+      .foreach(writerEventHitDeviceIdHour)
+      .start()    
 
     val eventPushMongoSig1s = signature1sDs
       .writeStream
@@ -621,6 +739,7 @@ object RawDataStreamMongo extends Utils {
 //      .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event5s?replicaSet=rs0&authSource=admin"))
 //      .start()
 
+    // eventPushHDFS.awaitTermination()
     //    eventPushMongo.awaitTermination()
     //    eventPushMongoSig1s.awaitTermination()
     //    eventPushMongoSig2s.awaitTermination()

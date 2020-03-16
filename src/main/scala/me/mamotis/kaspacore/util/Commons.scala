@@ -226,6 +226,6 @@ object Commons {
   case class CountryDestHitDeviceIdObjDay(device_id: String, dest_country: String, year: Integer, month: Integer, day: Integer, value: Long) extends Serializable
 
   case class SteviaObjSec(company: String, alert_msg: String, src_ip:String, src_country: String, dest_ip:String, dest_country: String, year: Integer, month: Integer, day: Integer,
-                                           hour: Integer, minute: Integer, second: Integer, value: Long) extends Serializable
+                                           hour: Integer, minute: Integer, second: Integer, value: Long, priority: Long) extends Serializable
 
 }

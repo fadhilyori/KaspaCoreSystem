@@ -315,17 +315,19 @@ object DataStream extends Utils {
         $"alert_msg",
         $"src_ip",
         $"dest_ip",
-        $"company")
+        $"company",
+        $"priority")
       .withColumn("value", lit(1))
       .groupBy(
         $"alert_msg",
         $"src_ip",
         $"dest_ip",
         $"company",
+        $"priority",
         window($"timestamp", "1 second").alias("windows"))
       .sum("value")
 
-    val signature1sDf_2 = signature1sDf_1.select($"company", $"alert_msg", $"windows.start", $"sum(value)", $"src_ip", $"dest_ip").map{
+    val signature1sDf_2 = signature1sDf_1.select($"company", $"alert_msg", $"windows.start", $"sum(value)", $"src_ip", $"dest_ip", $"priority").map{
       r =>
         val company = r.getAs[String](0)
         val alert_msg = r.getAs[String](1)
@@ -346,14 +348,15 @@ object DataStream extends Utils {
         val dest_ip = r.getAs[String](5)
         val src_country = Tools.IpLookupCountry(src_ip)
         val dest_country = Tools.IpLookupCountry(dest_ip)
+        val priority = r.getAs[Long](6)
 
         new Commons.SteviaObjSec(
-          company, alert_msg, src_ip, src_country, dest_ip, dest_country, year, month, day, hour, minute, second, value
+          company, alert_msg, src_ip, src_country, dest_ip, dest_country, year, month, day, hour, minute, second, value, priority
         )
     }.toDF(ColsArtifact.colsSteviaObjSec: _*)
 
     val signature1sDs = signature1sDf_2.select($"company", $"alert_msg", $"src_ip", $"src_country", $"dest_ip", $"dest_country", $"year",
-      $"month", $"day", $"hour", $"minute", $"second", $"value").as[Commons.SteviaObjSec]
+      $"month", $"day", $"hour", $"minute", $"second", $"value", $"priority").as[Commons.SteviaObjSec]
 
     //endregion
 
@@ -522,7 +525,7 @@ object DataStream extends Utils {
               doc.put("dest_port", sc.dest_port)
               doc.put("alert_message", sc.alert_msg)
               doc.put("classification", sc.classification)
-              doc.put("priority", sc.sig_id)
+              doc.put("priority", sc.priority)
               doc.put("sig_id", sc.sig_id)
               doc.put("sig_gen", sc.sig_gen)
               doc.put("sig_rev", sc.sig_rev)
@@ -573,6 +576,7 @@ object DataStream extends Utils {
                 doc.put("dest_ip", sc.dest_ip)
                 doc.put("dest_country", sc.dest_country)
                 doc.put("value", sc.value)
+                doc.put("priority", sc.priority)
                 doc
               }).asJava)
             })
@@ -716,35 +720,6 @@ object DataStream extends Utils {
       .queryName("Event Push Mongo 1s Window")
       .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event1s?replicaSet=rs0&authSource=admin"))
       .start()
-
-//    val eventPushMongoSig2s = signature2sDs
-//      .writeStream
-//      .outputMode("update")
-//      .queryName("Event Push Mongo 2s Window")
-//      .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event2s?replicaSet=rs0&authSource=admin"))
-//      .start()
-//
-//    val eventPushMongoSig3s = signature3sDs
-//      .writeStream
-//      .outputMode("update")
-//      .queryName("Event Push Mongo 3s Window")
-//      .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event3s?replicaSet=rs0&authSource=admin"))
-//      .start()
-//
-//    val eventPushMongoSig5s = signature5sDs
-//      .writeStream
-//      .outputMode("update")
-//      .queryName("Event Push Mongo 5s Window")
-//      .format("console")
-//      .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event5s?replicaSet=rs0&authSource=admin"))
-//      .start()
-
-    // eventPushHDFS.awaitTermination()
-    //    eventPushMongo.awaitTermination()
-    //    eventPushMongoSig1s.awaitTermination()
-    //    eventPushMongoSig2s.awaitTermination()
-    //    eventPushMongoSig3s.awaitTermination()
-    //    eventPushMongoSig5s.awaitTermination()
 
     sparkSession.streams.awaitAnyTermination()
   }

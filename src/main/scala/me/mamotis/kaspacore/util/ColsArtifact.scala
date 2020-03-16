@@ -164,6 +164,6 @@ object ColsArtifact {
 
   val colsCountryDestHitDeviceIdObjDay = List("device_id", "dest_country", "year", "month", "day", "value")
 
-  val colsSteviaObjSec = List("company", "alert_msg", "src_ip", "src_country", "dest_ip", "dest_country", "year", "month", "day", "hour", "minute", "second", "value")
+  val colsSteviaObjSec = List("company", "alert_msg", "src_ip", "src_country", "dest_ip", "dest_country", "year", "month", "day", "hour", "minute", "second", "value", "priority")
 
 }

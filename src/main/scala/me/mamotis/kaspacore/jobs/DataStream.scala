@@ -658,12 +658,12 @@ object DataStream extends Utils {
 
     //====================================================WRITE QUERY=================================
 
-    val eventPushMongo = eventDs
-      .writeStream
-      .outputMode("append")
-      .queryName("Event Push Mongo")
-      .foreach(writerMongo)
-      .start()
+//    val eventPushMongo = eventDs
+//      .writeStream
+//      .outputMode("append")
+//      .queryName("Event Push Mongo")
+//      .foreach(writerMongo)
+//      .start()
 
     val eventPushHDFS = eventDs
       .writeStream
@@ -718,7 +718,7 @@ object DataStream extends Utils {
       .writeStream
       .outputMode("update")
       .queryName("Event Push Mongo 1s Window")
-      .foreach(writerMongoSig("mongodb://admin:jarkoM@127.0.0.1:27017/stevia.event1s?replicaSet=rs0&authSource=admin"))
+      .foreach(writerMongoSig(PropertiesLoader.mongodbUri("event1s")))
       .start()
 
     sparkSession.streams.awaitAnyTermination()

@@ -2,8 +2,8 @@ package me.mamotis.kaspacore.jobs
 
 import com.datastax.spark.connector.cql.CassandraConnector
 import me.mamotis.kaspacore.util.PropertiesLoader
-import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.{SparkConf, SparkContext}
 
 private[jobs] trait Utils {
   def getSparkContext(session: SparkSession): SparkContext = {

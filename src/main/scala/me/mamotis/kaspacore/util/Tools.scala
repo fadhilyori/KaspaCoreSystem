@@ -1,43 +1,42 @@
 package me.mamotis.kaspacore.util
-import org.apache.spark.sql.types._
-
 import cats.effect.IO
-import com.snowplowanalytics.maxmind.iplookups.IpLookups
+import com.snowplowanalytics.maxmind.iplookups.{IpLookups, model}
 import org.apache.spark.SparkFiles
+import org.apache.spark.sql.types._
 
 object Tools {
 
-  val schema = new StructType()
-    .add("ts", StringType, true)
-    .add("company", StringType, true)
-    .add("device_id", StringType, true)
-    .add("year", IntegerType, true)
-    .add("month", IntegerType, true)
-    .add("day", IntegerType, true)
-    .add("hour", IntegerType, true)
-    .add("minute", IntegerType, true)
-    .add("second", IntegerType, true)
-    .add("protocol", StringType, true)
-    .add("ip_type", StringType, true)
-    .add("src_mac", StringType, true)
-    .add("dest_mac", StringType, true)
-    .add("src_ip", StringType, true)
-    .add("dest_ip", StringType, true)
-    .add("src_port", IntegerType, true)
-    .add("dest_port", IntegerType, true)
-    .add("alert_msg", StringType, true)
-    .add("classification", IntegerType, true)
-    .add("priority", IntegerType, true)
-    .add("sig_id", IntegerType, true)
-    .add("sig_gen", IntegerType, true)
-    .add("sig_rev", IntegerType, true)
-    .add("src_country", StringType, true)
-    .add("src_region", StringType, true)
-    .add("dest_country", StringType, true)
-    .add("dest_region", StringType, true)
+  val schema: StructType = new StructType()
+    .add("ts", StringType, nullable = true)
+    .add("company", StringType, nullable = true)
+    .add("device_id", StringType, nullable = true)
+    .add("year", IntegerType, nullable = true)
+    .add("month", IntegerType, nullable = true)
+    .add("day", IntegerType, nullable = true)
+    .add("hour", IntegerType, nullable = true)
+    .add("minute", IntegerType, nullable = true)
+    .add("second", IntegerType, nullable = true)
+    .add("protocol", StringType, nullable = true)
+    .add("ip_type", StringType, nullable = true)
+    .add("src_mac", StringType, nullable = true)
+    .add("dest_mac", StringType, nullable = true)
+    .add("src_ip", StringType, nullable = true)
+    .add("dest_ip", StringType, nullable = true)
+    .add("src_port", IntegerType, nullable = true)
+    .add("dest_port", IntegerType, nullable = true)
+    .add("alert_msg", StringType, nullable = true)
+    .add("classification", IntegerType, nullable = true)
+    .add("priority", IntegerType, nullable = true)
+    .add("sig_id", IntegerType, nullable = true)
+    .add("sig_gen", IntegerType, nullable = true)
+    .add("sig_rev", IntegerType, nullable = true)
+    .add("src_country", StringType, nullable = true)
+    .add("src_region", StringType, nullable = true)
+    .add("dest_country", StringType, nullable = true)
+    .add("dest_region", StringType, nullable = true)
 
-  def IpLookupCountry(ipAddress: String): String = {
-    val result = (for {
+  def lookups(ipAddress: String): model.IpLookupResult = {
+    (for {
       ipLookups <- IpLookups.createFromFilenames[IO](
         geoFile = Some(SparkFiles.get(PropertiesLoader.GeoIpFilename)),
         ispFile = None,
@@ -49,10 +48,14 @@ object Tools {
 
       lookup <- ipLookups.performLookups(ipAddress)
     } yield lookup).unsafeRunSync()
+  }
+
+  def IpLookupCountry(ipAddress: String): String = {
+    val result = lookups(ipAddress)
 
     result.ipLocation match {
       case Some(Right(loc)) =>
-        if(loc.countryName == None) "UNDEFINED"
+        if(loc.countryName.trim().isEmpty) "UNDEFINED"
         else loc.countryName
       case _ =>
         "UNDEFINED"
@@ -60,22 +63,11 @@ object Tools {
   }
 
   def IpLookupRegion(ipAddress: String): String = {
-    val result = (for {
-      ipLookups <- IpLookups.createFromFilenames[IO](
-        geoFile = Some(SparkFiles.get(PropertiesLoader.GeoIpFilename)),
-        ispFile = None,
-        domainFile = None,
-        connectionTypeFile = None,
-        memCache = false,
-        lruCacheSize = 20000
-      )
-
-      lookup <- ipLookups.performLookups(ipAddress)
-    } yield lookup).unsafeRunSync()
+    val result = lookups(ipAddress)
 
     result.ipLocation match {
       case Some(Right(loc)) =>
-        if(loc.regionName == None) "UNDEFINED"
+        if(loc.regionName.isEmpty) "UNDEFINED"
         else loc.regionName.get
       case _ =>
         "UNDEFINED"

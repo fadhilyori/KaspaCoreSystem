@@ -1,57 +1,23 @@
 package me.mamotis.kaspacore.jobs
 
-import me.mamotis.kaspacore.util.PropertiesLoader
 import java.time.{LocalDate, LocalDateTime}
 
-import me.mamotis.kaspacore.jobs.DailyCount.{getCassandraSession, getSparkContext, getSparkSession}
-import org.apache.spark.sql.SaveMode
+import me.mamotis.kaspacore.util.PropertiesLoader
+import org.apache.spark.SparkContext
 import org.apache.spark.sql.functions.lit
-import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+import org.apache.spark.sql.{Dataset, Row, SaveMode, SparkSession}
 
-object HourlyCount extends Utils {
+object HourlyCount extends BatchJob {
 
   def main(args: Array[String]): Unit = {
-    val sparkSession = getSparkSession(args)
-    val sparkContext = getSparkContext(sparkSession)
-    val schema = StructType(
-      Array(
-        StructField("ts", StringType, nullable = true),
-        StructField("company", StringType, nullable = true),
-        StructField("device_id", StringType, nullable = true),
-        StructField("year", IntegerType, nullable = true),
-        StructField("month", IntegerType, nullable = true),
-        StructField("day", IntegerType, nullable = true),
-        StructField("hour", IntegerType, nullable = true),
-        StructField("minute", IntegerType, nullable = true),
-        StructField("second", IntegerType, nullable = true),
-        StructField("protocol", StringType, nullable = true),
-        StructField("ip_type", StringType, nullable = true),
-        StructField("src_mac", StringType, nullable = true),
-        StructField("dest_mac", StringType, nullable = true),
-        StructField("src_ip", StringType, nullable = true),
-        StructField("dest_ip", StringType, nullable = true),
-        StructField("src_port", IntegerType, nullable = true),
-        StructField("dest_port", IntegerType, nullable = true),
-        StructField("alert_msg", StringType, nullable = true),
-        StructField("classification", IntegerType, nullable = true),
-        StructField("priority", IntegerType, nullable = true),
-        StructField("sig_id", IntegerType, nullable = true),
-        StructField("sig_gen", IntegerType, nullable = true),
-        StructField("sig_rev", IntegerType, nullable = true),
-        StructField("src_country", StringType, nullable = true),
-        StructField("src_region", StringType, nullable = true),
-        StructField("dest_country", StringType, nullable = true),
-        StructField("dest_region", StringType, nullable = true)
-      )
-    )
-
-    val connector = getCassandraSession(sparkContext)
+    val sparkSession: SparkSession = getSparkSession(args)
+    val sparkContext: SparkContext = getSparkContext(sparkSession)
 
     import sparkSession.implicits._
     sparkContext.setLogLevel("ERROR")
 
     // Raw Event Dataframe Parsing
-    val rawDf = sparkSession
+    val rawDf: Dataset[Row] = sparkSession
       .read.schema(schema).json(PropertiesLoader.hadoopEventFilePath)
       .select($"company", $"device_id", $"protocol", $"src_port", $"dest_port", $"src_ip", $"dest_ip", $"src_country",
         $"dest_country", $"alert_msg", $"year", $"month", $"day", $"hour")
@@ -63,7 +29,7 @@ object HourlyCount extends Utils {
 
     // ======================================Company==============================
     // Hit Count
-    val countedHitCompanyDf = rawDf
+    val countedHitCompanyDf: Dataset[Row] = rawDf
       .groupBy($"company")
       .count()
       .sort($"company".desc, $"count".desc)
